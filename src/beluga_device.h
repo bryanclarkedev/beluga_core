@@ -25,7 +25,10 @@ namespace beluga_core
             virtual bool initialise(std::string config_file_path, std::string config_section);
             virtual bool initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section);
             virtual bool read_config();
-
+            /*
+            TODO: set_debug_print_enabled
+            debug_print (call beluga_utils::debug_print(s, force) with force from beluga_core::device._debug_print )
+            */
             /*
             We are using a void pointer as the argument to run.
             This is dangerous! But it can be useful in select cases:

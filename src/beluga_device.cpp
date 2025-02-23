@@ -1,4 +1,4 @@
-#include "beluga_device.h"
+#include "device.h"
 
 namespace beluga_core
 {
@@ -10,7 +10,7 @@ namespace beluga_core
     \date gotta check
     \details Given a config file path and config section key, initialises this device.
     */
-    bool beluga_device::initialise(std::string config_file_path, std::string config_section)
+    bool device::initialise(std::string config_file_path, std::string config_section)
     {
         //Serial.println("Beluga device init");
         _config_file_path = config_file_path;
@@ -24,14 +24,14 @@ namespace beluga_core
     }
 
     //Initialise using a given ini reader
-    bool beluga_device::initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section)
+    bool device::initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section)
     {
         _ini_ptr = ini;
         _config_file_section = config_section;
         return read_config();
     }
 
-    bool beluga_device::read_config()
+    bool device::read_config()
     {
         bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
 
@@ -53,13 +53,13 @@ namespace beluga_core
         return true;
     }
 
-    void beluga_device::set_enabled(std::string s)
+    void device::set_enabled(std::string s)
     {
         set_enabled(beluga_utils::string_to_bool(s));    
         return;
     }
 
-    void beluga_device::set_enabled(bool b)
+    void device::set_enabled(bool b)
     {
         _enabled = b;
         return;
