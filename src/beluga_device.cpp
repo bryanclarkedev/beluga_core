@@ -64,4 +64,16 @@ namespace beluga_core
         _enabled = b;
         return;
     }
+
+    void device::set_serial_debug_enabled(std::string s)
+    {
+        set_serial_debug_enabled(beluga_utils::string_to_bool(s));    
+        return;
+    }
+
+    void device::set_serial_debug_enabled(bool b)
+    {
+        _serial_debug_enabled = b;
+        return;
+    }
 }

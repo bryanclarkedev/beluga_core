@@ -68,7 +68,9 @@ namespace beluga_core
 
             void set_enabled(std::string s);
             void set_enabled(bool b);
-
+            void set_serial_debug_enabled(std::string s);
+            void set_serial_debug_enabled(bool b);
+            
 
         protected:
             bool _initialised = false;
