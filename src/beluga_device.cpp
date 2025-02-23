@@ -1,4 +1,4 @@
-#include "device.h"
+#include "beluga_device.h"
 
 namespace beluga_core
 {
