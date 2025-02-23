@@ -1,0 +1,67 @@
+#include "beluga_device.h"
+
+namespace beluga_core
+{
+
+
+    /*!
+    \brief Base class 
+    \author Bryan Clarke
+    \date gotta check
+    \details Given a config file path and config section key, initialises this device.
+    */
+    bool beluga_device::initialise(std::string config_file_path, std::string config_section)
+    {
+        //Serial.println("Beluga device init");
+        _config_file_path = config_file_path;
+        _config_file_section = config_section;
+        _ini_ptr = std::make_shared<beluga_utils::ini_reader>(config_file_path);
+        _ini_ptr->initialise();
+
+        bool config_ok = read_config();
+        _ini_ptr.reset(); //Delete the shared_ptr for the config
+        return config_ok;
+    }
+
+    //Initialise using a given ini reader
+    bool beluga_device::initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section)
+    {
+        _ini_ptr = ini;
+        _config_file_section = config_section;
+        return read_config();
+    }
+
+    bool beluga_device::read_config()
+    {
+        bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
+
+        bool config_ok = false;
+        std::string config_val;
+        config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
+        if(config_ok)
+        {
+            set_serial_debug_enable(config_val);
+        }  
+
+        bool enable_ok = false;
+        enable_ok = _ini_ptr->get_config_value(_config_file_section, "enabled", &config_val );
+        if(config_ok)
+        {
+            set_enabled(config_val);
+        }  
+
+        return true;
+    }
+
+    void beluga_device::set_enabled(std::string s)
+    {
+        set_enabled(beluga_utils::string_to_bool(s));    
+        return;
+    }
+
+    void beluga_device::set_enabled(bool b)
+    {
+        _enabled = b;
+        return;
+    }
+}
