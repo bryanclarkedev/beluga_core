@@ -40,7 +40,7 @@ namespace beluga_core
         config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
         if(config_ok)
         {
-            set_serial_debug_enable(config_val);
+            set_serial_debug_enabled(config_val);
         }  
 
         bool enable_ok = false;
