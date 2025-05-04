@@ -66,23 +66,6 @@ namespace beluga_core
                 return this_mechanism->get_value(t, value_name);
             }
 
-            /*
-            template<typename T>
-            bool get_subdevice(std::string s,  std::shared_ptr<T> & return_val)            
-            {
-                for(auto iter = _subdevices.begin(); iter != _subdevices.end(); iter++)
-                {
-                    if(iter->first == s)
-                    {
-                        //return_val = _subdevices[s];
-                        std::shared_ptr<beluga_core::device> this_device = _subdevices[s];
-                        return_val = std::static_pointer_cast<T>(this_device);
-                        return true;
-                    }
-                }
-                return false;
-            }
-            */
             bool get_subdevice(std::string s,  std::shared_ptr<beluga_core::device> & return_val)            
             {
                 for(auto iter = _subdevices.begin(); iter != _subdevices.end(); iter++)
