@@ -21,7 +21,7 @@ namespace beluga_core
 
     bool digital_output::read_config()
     {
-        bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
+        //bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
 
         bool config_ok = false;
         std::string config_val;

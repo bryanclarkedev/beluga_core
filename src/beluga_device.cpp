@@ -27,6 +27,8 @@ namespace beluga_core
     bool device::initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section)
     {
         _ini_ptr = ini;
+        _ini_ptr->initialise();
+
         _config_file_section = config_section;
         return read_config();
     }

@@ -47,7 +47,7 @@ namespace beluga_core
         _config_file_section = config_file_section;
         ini_reader ini(config_file_path);
         */
-        bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
+        //bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
 
         bool config_ok = false;
         std::string config_val;
