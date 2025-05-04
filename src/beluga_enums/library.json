@@ -1,0 +1,25 @@
+{
+    "name": "beluga_enums",
+    "version": "0.0.1",
+    "description": "Description goes here",
+    "keywords": "base, inherited",
+    "repository":
+    {
+      "type": "git",
+      "url": "https://github.com/username/hello-world.git"
+    },
+    "authors":
+    [
+      {
+        "name": "Bryan Clarke",
+        "email": "bryanclarke1@gmail.com",
+        "url": "https://www.john-smith/contact"
+      }
+    ],
+    "license": "N/A",
+    "homepage": "https://www.bryanclarke.dev/",
+    "dependencies": {
+    },
+    "frameworks": "arduino",
+    "platforms": "espressif32"
+  }

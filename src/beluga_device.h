@@ -87,7 +87,12 @@ namespace beluga_core
             unsigned long _time_ms = 0;
             std::shared_ptr<beluga_utils::ini_reader> _ini_ptr;
             std::string _device_name = "";
-            std::string _device_type = std::string(beluga_utils::type_name(this));
+            std::string _device_type_str = std::string(beluga_utils::type_name(this));
+
+            bool _initialisaton_warning = false;
+            bool _initialisation_error = true;
+            bool _runtime_warning = false;
+            bool _runtime_error = false;
 
     };
 

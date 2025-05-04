@@ -23,10 +23,13 @@ void setup() {
     Serial.println(5-i);
     delay(1000);
   }    
-  this_ini.initialise();
+  //this_ini.initialise();
   std::string device_name("demo_device");
+  Serial.print("----Initialising device ");
+  Serial.println(device_name.c_str());
   this_device.initialise(config_file_path, device_name);
 
+  Serial.println("---printing config---");
   this_ini.print_config_to_serial();
 
   std::string val;

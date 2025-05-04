@@ -33,8 +33,6 @@ namespace beluga_core
 
     bool device::read_config()
     {
-        bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
-
         bool config_ok = false;
         std::string config_val;
         config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
