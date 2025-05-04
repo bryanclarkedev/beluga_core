@@ -73,6 +73,7 @@ namespace beluga_core
         bool names_ok = _ini_ptr->get_config_list_field(_config_file_section, name_config_key, raw_comms_names);
         if(! names_ok)
         {
+            Serial.println("No comms devices present");
             return false;
         }
 
@@ -259,7 +260,6 @@ namespace beluga_core
         {
             comms_iter->second->run_tx();
         }
-
         return true;
     }
 }

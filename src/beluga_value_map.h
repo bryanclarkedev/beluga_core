@@ -93,6 +93,7 @@ namespace beluga_core
                 {
                     for(auto iter = _values.begin(); iter != _values.end(); iter++)
                     {
+                        //---something breaks here-----
                         if(iter->first == s)
                         {
                             return _values[s].get_value(return_val);

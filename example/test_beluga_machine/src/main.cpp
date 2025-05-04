@@ -24,6 +24,7 @@ void setup() {
 
 void loop() {
   bool b = this_machine.run();
+
   /*
   We assume that the subdevice name and type are known to the programmer. 
   It's probably possible to write something generic that scrapes the .ini but difficult to do something useful with that
@@ -39,7 +40,7 @@ void loop() {
   
   Serial.print("Button state: ");
   Serial.println((int) in_val);
- 
+
   ss.str("");
   ss << "Iteration " << iter << " time " << (int) (millis() / 1000) << "s";
   Serial.println(ss.str().c_str());

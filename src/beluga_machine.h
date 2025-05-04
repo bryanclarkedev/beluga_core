@@ -62,10 +62,11 @@ namespace beluga_core
                 std::shared_ptr<beluga_core::device> this_device;
                 std::shared_ptr<beluga_core::mechanism<T> > this_mechanism;
                 bool got_subdevice = get_subdevice(mechanism_name, this_device);
-                this_mechanism = std::static_pointer_cast<T>(this_device);
+                this_mechanism = std::static_pointer_cast<beluga_core::mechanism<T> >(this_device);
                 return this_mechanism->get_value(t, value_name);
             }
 
+            /*
             template<typename T>
             bool get_subdevice(std::string s,  std::shared_ptr<T> & return_val)            
             {
@@ -81,6 +82,22 @@ namespace beluga_core
                 }
                 return false;
             }
+            */
+            bool get_subdevice(std::string s,  std::shared_ptr<beluga_core::device> & return_val)            
+            {
+                for(auto iter = _subdevices.begin(); iter != _subdevices.end(); iter++)
+                {
+                    if(iter->first == s)
+                    {
+                        return_val = _subdevices[s];
+                        //std::shared_ptr<beluga_core::device> this_device = _subdevices[s];
+                        //return_val = std::static_pointer_cast<T>(this_device);
+                        return true;
+                    }
+                }
+                return false;
+            }
+
 
             template<typename T>
             bool get_comms(std::string s, std::shared_ptr<T> & return_val)
@@ -89,8 +106,9 @@ namespace beluga_core
                 {
                     if(iter->first == s)
                     {
-                        std::shared_ptr<beluga_core::comms> this_comms = _comms_map[s];
-                        return_val = std::static_pointer_cast<T>(this_comms);
+                        return_val = _comms_map[s];
+                        //std::shared_ptr<beluga_core::comms> this_comms = _comms_map[s];
+                        //return_val = std::static_pointer_cast<T>(this_comms);
                         return true;
                     }
                 }
