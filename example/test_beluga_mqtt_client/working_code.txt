@@ -1,0 +1,170 @@
+/*
+ Reconnecting MQTT example - non-blocking
+
+ This sketch demonstrates how to keep the client connected
+ using a non-blocking reconnect function. If the client loses
+ its connection, it attempts to reconnect every 5 seconds
+ without blocking the main loop.
+
+*/
+
+/*********
+  Rui Santos
+  Complete project details at https://randomnerdtutorials.com  
+*********/
+#include <WiFi.h>
+#include <PubSubClient.h>
+
+// Replace the next variables with your SSID/Password combination
+const char* ssid = "GoogleMesh1";
+const char* password = "rolandpuppy";
+
+std::string client_name = "ESP32_Client";
+
+const char* mqtt_username = "beluga";
+const char* mqtt_password = "beluga_mqtt";
+// Add your MQTT Broker IP address, example:
+const char* mqtt_server = "broker.hivemq.com";
+unsigned long lastReconnectAttempt = 0;
+
+
+WiFiClient espWifiClient;
+PubSubClient client(espWifiClient);
+long lastMsg = 0;
+char msg[50];
+int value = 0;
+
+float time_meas_ms = 0;
+
+// LED Pin
+const int ledPin = 2;// LED_BUILTIN; //Pin 2
+
+void setup() {
+  Serial.begin(115200);
+  // default settings
+  
+  setup_wifi();
+  client.setServer(mqtt_server, 1883);
+  client.setCallback(callback);
+
+  pinMode(ledPin, OUTPUT);
+}
+
+void setup_wifi() {
+  delay(10);
+  // We start by connecting to a WiFi network
+  Serial.println();
+  Serial.print("Connecting to ");
+  Serial.println(ssid);
+
+  WiFi.begin(ssid, password);
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi connected");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void callback(char* topic, byte* message, unsigned int length) {
+  Serial.print("Message arrived on topic: ");
+  Serial.print(topic);
+  Serial.print(". Message: ");
+  String message_str;
+  
+  for (int i = 0; i < length; i++) {
+    Serial.print((char)message[i]);
+    message_str += (char)message[i];
+  }
+  Serial.println();
+
+  // Feel free to add more if statements to control more GPIOs with MQTT
+
+  // If a message is received on the topic esp32/output, you check if the message is either "on" or "off". 
+  // Changes the output state according to the message
+  if (String(topic) == "esp32/output") {
+    Serial.print("Changing output to ");
+    if(message_str == "on"){
+      Serial.println("on");
+      digitalWrite(ledPin, HIGH);
+    }
+    else if(message_str == "off"){
+      Serial.println("off");
+      digitalWrite(ledPin, LOW);
+    }
+  }
+}
+
+boolean nonblock_reconnect() {
+    
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect    
+    //if (client.connect(client_name.c_str(), mqtt_username, mqtt_password)) {
+     if (client.connect(client_name.c_str())) {
+
+      Serial.println("connected");
+      // Subscribe
+      std::string subscription_topic_name = "esp32/output";
+      client.subscribe(subscription_topic_name.c_str());
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in a few seconds");
+  }
+  return client.connected();
+}
+
+void reconnect() {
+  // Loop until we're reconnected
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    // Attempt to connect    
+    if (client.connect(client_name.c_str(), mqtt_username, mqtt_password)) {
+      Serial.println("connected");
+      // Subscribe
+      std::string subscription_topic_name = "esp32/output";
+      client.subscribe(subscription_topic_name.c_str());
+    } else {
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds");
+      // Wait 5 seconds before retrying
+      delay(5000);
+    }
+  }
+}
+
+void loop() {
+  if (!client.connected()) {
+    unsigned long now = millis();
+    if (now - lastReconnectAttempt > 5000) {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      if (nonblock_reconnect()) {
+        lastReconnectAttempt = 0;
+      }
+    }
+  }else{
+    //Cient connected
+    client.loop();
+
+    long now = millis();
+    if (now - lastMsg > 5000) {
+      lastMsg = now;
+      
+      // time_meas_ms in Celsius
+      time_meas_ms = now;   
+      
+      // Convert the value to a char array
+      char tempString[15];
+      dtostrf(time_meas_ms, 1, 2, tempString);
+      Serial.print("time_meas_ms: ");
+      Serial.println(tempString);
+      client.publish("esp32/time_meas_ms", tempString);
+    }
+  }
+}

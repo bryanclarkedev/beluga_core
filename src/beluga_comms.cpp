@@ -52,6 +52,7 @@ namespace beluga_core
         if(rx_topics_ok)
         {
             std::vector<std::string> rx_topics = beluga_utils::split_string(rx_topics_list_val, beluga_utils::topic_list_delimiter);
+            _rx_topic_list.clear();
             for(auto iter = rx_topics.begin(); iter != rx_topics.end(); iter++)
             {
                 std::stringstream ss;

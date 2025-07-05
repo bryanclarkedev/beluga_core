@@ -9,6 +9,7 @@ ENUMITEM(analog_input)
 ENUMITEM(tcp_client)
 ENUMITEM(wifi_connection)
 ENUMITEM(mqtt_client)
+ENUMITEM(primary_thread)
 
 #if ENABLE_MQTT_SERVER
 ENUMITEM(mqtt_server)
@@ -20,11 +21,12 @@ ENUMITEM(deepsleep)
 
 ENUMITEM(thread)
 ENUMITEM(interthread_buffer)
-ENUMITEM(machinery_thread)
 ENUMITEM(dualthread)
 
 ENUMITEM(mqtt_client_machinery)
 ENUMITEM(led_machinery)
+ENUMITEM(bmp280_temperature_pressure)
+ENUMITEM(lipo_fuel_gauge)
 
 /*
 ENUMITEM(Button)

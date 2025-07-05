@@ -33,6 +33,16 @@ namespace beluga_core
         return read_config();
     }
 
+    /*!
+    Config variables:
+    enable_serial_debug: bool
+    enabled: bool
+
+    e.g.:
+    [device_name1]
+    enable_serial_debug = true
+    enabled = true
+    */
     bool device::read_config()
     {
         bool config_ok = false;

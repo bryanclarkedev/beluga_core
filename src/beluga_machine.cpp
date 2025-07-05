@@ -45,6 +45,30 @@ namespace beluga_core
     It is recommended that all objects inheriting from beluga_machine re-implement read_config
     They should start with:
     beluga_machine::read_config(); //Calls the base config, which calls initialise_subdevices
+
+
+    config variables:
+    [device_name1]
+    enable_serial_debug = true
+    enabled = true
+    subdevice_names = name1,name2
+    comms_names = cname1,cname2
+
+    [name1]
+    device_type = type1
+    etc
+
+    [name2]
+    device_type = type2
+    etc
+
+    [cname1]
+    device_type = type3
+    etc
+
+    [cname2]
+    device_type = type4
+    etc
     */
     bool machine::read_config()
     {
@@ -150,6 +174,7 @@ namespace beluga_core
             Serial.println(subdevice_type.c_str());
             return false;
         }
+        device_ptr->set_parent(std::shared_ptr<beluga_core::device>(this));
 
         Serial.print("Created subdevice ");
         Serial.print(subdevice_name.c_str());

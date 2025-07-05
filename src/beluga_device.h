@@ -25,6 +25,10 @@ namespace beluga_core
             virtual bool initialise(std::string config_file_path, std::string config_section);
             virtual bool initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section);
             virtual bool read_config();
+            virtual void set_parent(std::shared_ptr<device> this_parent_ptr)
+            {
+                _parent_object = this_parent_ptr;
+            }
             /*
             TODO: set_debug_print_enabled
             debug_print (call beluga_utils::debug_print(s, force) with force from beluga_core::device._debug_print )
@@ -64,6 +68,8 @@ namespace beluga_core
                 swap(first._json_report, second._json_report);
                 swap(first._config_file_path, second._config_file_path);
                 swap(first._config_file_section, second._config_file_section);
+
+                swap(first._parent_object, second._parent_object);
             }
 
             void set_enabled(std::string s);
@@ -88,7 +94,7 @@ namespace beluga_core
             std::shared_ptr<beluga_utils::ini_reader> _ini_ptr;
             std::string _device_name = "";
             std::string _device_type_str = std::string(beluga_utils::type_name(this));
-
+            std::shared_ptr<device> _parent_object = nullptr;
             bool _initialisaton_warning = false;
             bool _initialisation_error = true;
             bool _runtime_warning = false;

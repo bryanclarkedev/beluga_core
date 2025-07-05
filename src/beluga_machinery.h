@@ -41,8 +41,7 @@ namespace beluga_core
 
             virtual bool get_tx(std::list<std::string> & tx, bool overwrite_not_append = true);
 
-
-            virtual bool handle_primary_rx(std::vector< std::map<std::string, std::string> > & rx_subtopic_map_vec){ return false; }
+            virtual bool handle_primary_rx(){return false;}//std::std::vector< std::map<std::string, std::string> > & rx_subtopic_map_vec);//{ return false; }
 
             virtual bool generate_primary_tx(){return false;}
 
