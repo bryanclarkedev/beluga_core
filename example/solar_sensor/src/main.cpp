@@ -63,6 +63,15 @@ void loop() {
   Serial.println(ss.str().c_str());
   #endif
 
+
+  std::string button_name = "button3";
+  bool button_state;
+  bool got_button_ok = this_machine.get_state(button_name, button_state);
+  ss.str("");
+  ss << "Button state: " << button_state;
+  Serial.println(ss.str().c_str());
+
+
 #if 0
   std::string fuel_gauge_name = "fuel_gauge";
   float voltage_V, percentage;
