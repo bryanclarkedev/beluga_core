@@ -27,6 +27,7 @@ ENUMITEM(mqtt_client_machinery)
 ENUMITEM(led_machinery)
 ENUMITEM(bmp280_temperature_pressure)
 ENUMITEM(lipo_fuel_gauge)
+ENUMITEM(sd2405_rtc)
 
 /*
 ENUMITEM(Button)

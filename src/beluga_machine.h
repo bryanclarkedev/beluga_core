@@ -59,6 +59,7 @@ namespace beluga_core
             template<typename T>
             bool get_state(std::string mechanism_name, T & t, std::string value_name = "")
             {
+                
                 std::shared_ptr<beluga_core::device> this_device;
                 std::shared_ptr<beluga_core::mechanism<T> > this_mechanism;
                 bool got_subdevice = get_subdevice(mechanism_name, this_device);

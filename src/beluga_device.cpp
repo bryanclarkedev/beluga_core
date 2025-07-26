@@ -12,7 +12,7 @@ namespace beluga_core
     */
     bool device::initialise(std::string config_file_path, std::string config_section)
     {
-        //Serial.println("Beluga device init");
+        Serial.println("Beluga device init");
         _config_file_path = config_file_path;
         _config_file_section = config_section;
         _ini_ptr = std::make_shared<beluga_utils::ini_reader>(config_file_path);
@@ -27,8 +27,10 @@ namespace beluga_core
     bool device::initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section)
     {
         _ini_ptr = ini;
-        _ini_ptr->initialise();
-
+        if(! _ini_ptr->is_initialised())
+        {
+            _ini_ptr->initialise();
+        }
         _config_file_section = config_section;
         return read_config();
     }

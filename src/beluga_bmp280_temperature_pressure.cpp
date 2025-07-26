@@ -19,7 +19,7 @@ namespace beluga_core
         swap(*this, other); 
         return *this;
     }
-    
+    #if 0
     void bmp280_temperature_pressure::printLastOperateStatus(DFRobot_BMP280_IIC::eStatus_t eStatus)
     {
     switch(eStatus) {
@@ -30,7 +30,7 @@ namespace beluga_core
     default: Serial.println("unknow status"); break;
     }
     }
-    
+    #endif
     bool bmp280_temperature_pressure::read_config()
     {
         bool config_ok = false;
@@ -44,18 +44,25 @@ namespace beluga_core
         add_new_value("pressure_Pa");
         add_new_value("temperature_C");
         add_new_value("altitude_m");
+        #if 0
         _pressure_temperature.reset();
         while(_pressure_temperature.begin() != DFRobot_BMP280_IIC::eStatusOK) {
             Serial.println("bmp begin faild");
-            printLastOperateStatus(_pressure_temperature.lastOperateStatus);
+           // printLastOperateStatus(_pressure_temperature.lastOperateStatus);
             delay(2000);
         }
-        /*
+        #endif
+        
         uint8_t status = _pressure_temperature.begin(0x76);
         if (!status) {
-            error_loop_forever("bmp280_temperature_pressure: Could not find a valid BMP280 sensor, check wiring or try a different address!");
+            Serial.println("bmp280_temperature_pressure: Could not find a valid BMP280 sensor, check wiring or try a different address!");
         }
-        */
+          /* Default settings from datasheet. */
+  _pressure_temperature.setSampling(Adafruit_BMP280::MODE_NORMAL,     /* Operating Mode. */
+                  Adafruit_BMP280::SAMPLING_X2,     /* Temp. oversampling */
+                  Adafruit_BMP280::SAMPLING_X16,    /* Pressure oversampling */
+                  Adafruit_BMP280::FILTER_X16,      /* Filtering. */
+                  Adafruit_BMP280::STANDBY_MS_500); /* Standby time. */
 
 
         return true;
@@ -65,10 +72,9 @@ namespace beluga_core
     bool bmp280_temperature_pressure::run(void * p )
     {
 
-        float temperature_C = _pressure_temperature.getTemperature();
-        float pressure_Pa = _pressure_temperature.getPressure();
-        float altitude_m = _pressure_temperature.calAltitude(1013.25, pressure_Pa);
-
+        float temperature_C = _pressure_temperature.readTemperature();
+        float pressure_Pa = _pressure_temperature.readPressure();
+        float altitude_m = _pressure_temperature.readAltitude(1013.25);//, pressure_Pa);
         set_value(temperature_C, "temperature_C");
         set_value(pressure_Pa, "pressure_Pa");
         set_value(altitude_m, "altitude_m");

@@ -41,6 +41,13 @@ void loop() {
   Serial.print("Button state: ");
   Serial.println((int) in_val);
 
+  float temperature_C;
+  std::string bmp280_name = "bmp280";
+  std::string temperature_key = "temperature_C";
+  bool temp_val = this_machine.get_state(bmp280_name, temperature_C, temperature_key);
+  Serial.print("Temperature: ");
+  Serial.println(temperature_C);
+
   ss.str("");
   ss << "Iteration " << iter << " time " << (int) (millis() / 1000) << "s";
   Serial.println(ss.str().c_str());

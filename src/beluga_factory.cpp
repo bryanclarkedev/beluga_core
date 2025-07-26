@@ -13,6 +13,7 @@
 #include "beluga_mqtt_client_machinery.h"
 #include "beluga_bmp280_temperature_pressure.h"
 #include "beluga_lipo_fuel_gauge.h"
+#include "beluga_sd2405_rtc.h"
 #if 0
 
 #include "beluga_tcp_client.h"
@@ -74,10 +75,14 @@ namespace beluga_core
             {
                 return std::make_shared<bmp280_temperature_pressure>();
             }  
-                        case beluga_core_object_enum::lipo_fuel_gauge:
+            case beluga_core_object_enum::lipo_fuel_gauge:
             {
                 return std::make_shared<lipo_fuel_gauge>();
             } 
+            case beluga_core_object_enum::sd2405_rtc:
+            {
+                return std::make_shared<sd2405_rtc>();
+            }             
            /* case beluga_core_object_enum::mqtt_client_machinery:
             {
                 return std::make_shared<mqtt_client_machinery>();
