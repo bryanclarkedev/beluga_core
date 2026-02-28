@@ -24,7 +24,6 @@ void setup() {
 
 void loop() {
   bool b = this_machine.run();
-
   /*
   We assume that the subdevice name and type are known to the programmer. 
   It's probably possible to write something generic that scrapes the .ini but difficult to do something useful with that
@@ -33,21 +32,23 @@ void loop() {
   bool in_val; 
   std::string d_in_name = "digital_input1";
   bool got_val = this_machine.get_state(d_in_name, in_val);
-  
   //Use d_in to drive d_out
   std::string d_out_name = "digital_output1";
   bool set_val = this_machine.set_setpoint(d_out_name, in_val);
-  
+
   Serial.print("Button state: ");
   Serial.println((int) in_val);
 
+  #if 0
   float temperature_C;
   std::string bmp280_name = "bmp280";
   std::string temperature_key = "temperature_C";
   bool temp_val = this_machine.get_state(bmp280_name, temperature_C, temperature_key);
   Serial.print("Temperature: ");
   Serial.println(temperature_C);
+  #endif
 
+  
   ss.str("");
   ss << "Iteration " << iter << " time " << (int) (millis() / 1000) << "s";
   Serial.println(ss.str().c_str());

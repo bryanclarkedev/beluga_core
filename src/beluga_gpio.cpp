@@ -1,18 +1,10 @@
 #include "beluga_gpio.h"
+#include "beluga_debug.h"
 
 namespace beluga_core
 {
         
-    gpio::gpio()
-    {
-        #if 0
-        //Some #defines for the FireBeetle ESP32 board
-        _gpio_map["D0"] = D0;
-        _gpio_map["D1"] = D1;
-        _gpio_map["D2"] = D2;
-        _gpio_map["D3"] = D3;
-        #endif
-    }
+
 
     //copy-and-swap for operator= per https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
     gpio& gpio::operator=(gpio other) 
@@ -27,13 +19,12 @@ namespace beluga_core
     {
         // enable ADL (not necessary in our case, but good practice)
         using std::swap;
-        
         // by swapping the members of two objects,
         // the two objects are effectively swapped
         swap(static_cast<device &>(first), static_cast<device &>(second));
         swap(first._pin_number, second._pin_number);
         swap(first._pin_direction, second._pin_direction);
-        swap(first._gpio_map, second._gpio_map);
+        //swap(first._gpio_map, second._gpio_map);
         swap(first._pin_number_set, second._pin_number_set);
         swap(first._pin_direction_set, second._pin_direction_set);
         swap(first._configured, second._configured);
@@ -47,15 +38,11 @@ namespace beluga_core
         _config_file_section = config_file_section;
         ini_reader ini(config_file_path);
         */
-        //bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
+        bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
 
         bool config_ok = false;
         std::string config_val;
-        config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
-        if(config_ok)
-        {
-            set_serial_debug_enabled(config_val);
-        }
+
         config_ok = _ini_ptr->get_config_value(_config_file_section, "pin", &config_val );
         if(config_ok)
         {
@@ -87,7 +74,13 @@ namespace beluga_core
             uint8_t this_pin;
             if(s[0] == 'D')
             {//Assume Firebeetle format, D1, D2, etc
-                this_pin = _gpio_map[s];
+                #ifdef BOARD
+                #if BOARD == "ESP32"
+                    this_pin = firebeetle_gpio_map[s];
+                #else
+                    assert(false);
+                #endif
+                #endif
             }else{
                 //Assume stringified integer.
                 this_pin = stoi(s);
@@ -141,10 +134,9 @@ namespace beluga_core
 
     bool gpio::configure()
     {
-
         if (!( _pin_number_set && _pin_direction_set))
         {
-            Serial.println("Could not configure!!!!");
+            beluga_utils::debug_print("Could not configure!!!!");
             return false;
         }
         try{
@@ -152,7 +144,7 @@ namespace beluga_core
             _configured = true;
         }catch(...)
         {
-            Serial.println("Error configuring!!!!");
+            beluga_utils::debug_print("Error configuring!!!!");
             return false;
         }
         return true;    
@@ -162,8 +154,6 @@ namespace beluga_core
     {
         return _configured;
     }
-
-
 
     bool gpio::analog_read(int16_t & return_val)
     {

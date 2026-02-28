@@ -26,20 +26,17 @@ Author:
 Pranav Cherukupalli <cherukupallip@gmail.com>
 */
 //Deep sleep stuff - time-based wake
-#define s_to_us_factor 1000000ULL  /* Conversion factor for micro seconds to seconds */
-#define ms_to_us_factor 1000
-
-enum deepsleep_duration_mode { time_duration, iteration_duration };
-
-
-
+#define us_per_s 1000000ULL  /* Conversion factor for micro seconds to seconds */
+#define ms_per_s 1000
 
 
 namespace beluga_core
 {
     class deepsleep : public mechanism<uint16_t>
     {
-        
+
+        enum deepsleep_wake_duration_mode { n_iterations, duration_s };
+
         public:
             deepsleep(){};
             //Copy constructor
@@ -53,23 +50,25 @@ namespace beluga_core
             bool get_wakeup_reason(std::string & return_val);
 
             void commence_deepsleep();
-            void print_wakeup_reason();
+            //void print_wakeup_reason();
 
         protected:
             void configure_deepsleep();
+            bool read_config_sleep_duration();
+            bool read_config_wake_duration();
+            bool read_config_wake_button();
+
             bool run_deepsleep_iterations();
             bool run_deepsleep_time();
-            unsigned long _dt_ms = 0;
-            deepsleep_duration_mode _mode = deepsleep_duration_mode::time_duration;
+            unsigned long _wake_dt_ms = 0;
+            unsigned long _wake_iterations = 0;
+            deepsleep_wake_duration_mode _mode = deepsleep_wake_duration_mode::duration_s;
 
             bool _enable_wake_button = false;
             uint16_t _wake_button_pin_number = 0;
-            const uint16_t WAKE_ITERATIONS_THRESHOLD_DEFAULT = 50;
-            const uint16_t WAKE_TIME_THRESHOLD_S_DEFAULT = 60;
-            //6 minutes = 360s = 360000ms
-            const uint16_t SLEEP_DURATION_S_DEFAULT = 300; //000 * ms_to_us_factor;
-            const uint16_t SLEEP_IMMEDIATELY = 1;
-            const uint16_t DO_NOT_SLEEP_IMMEDIATELY = 0;
-            std::map<bool, uint16_t> deepsleep_immediately_map;
+            bool _deepsleep_immediately_when_triggered = false;
+            uint16_t _wake_duration_threshold = 60;
+            uint16_t _sleep_duration_s = 60;
+            unsigned long _prev_time_ms = 0;
     };
 }

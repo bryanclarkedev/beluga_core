@@ -51,7 +51,7 @@ namespace beluga_core
     */
     bool dualthread::read_config()
     {
-        beluga_core::machine::read_config(); //Calls the base config, which callss machine::read_config, which calls initialise_subdevices
+        beluga_core::machinery::read_config(); //Calls the base config, which callss machine::read_config, which calls initialise_subdevices and initialise_comms
 
 
         std::string app_name_key("app_name");
@@ -90,14 +90,15 @@ namespace beluga_core
         {
             beluga_utils::debug_print_loop_forever("dualthread_error: incorrect number of buffer names (should be 2)");
         }
-
         _thread1 = std::static_pointer_cast<beluga_core::thread>(_subdevices[_thread_names[0]]);
         _thread2 = std::static_pointer_cast<beluga_core::thread>(_subdevices[_thread_names[1]]);
-        #if 1
         _buffer1 = std::static_pointer_cast<beluga_core::interthread_buffer>(_comms_map[_buffer_names[0]]);
         _buffer2 = std::static_pointer_cast<beluga_core::interthread_buffer>(_comms_map[_buffer_names[1]]);
-        #endif
- 
+        //bool got_b1 = get_comms(_buffer_names[0], _buffer1);
+        //bool got_b2 = get_comms(_buffer_names[1], _buffer1);
+        //assert(got_b1 && got_b2);
+        //_buffer2 = _comms_map[_buffer_names[1]];
+        
  /*
         #if 0
         _thread1 = std::make_shared<beluga_core::thread>();
@@ -113,10 +114,23 @@ namespace beluga_core
         _buffer2->initialise(_ini_ptr, _buffer_names[1]);
         */
         //The buffers are unidirectional. TX for one is RX for the other.
+        try
+        {
         _thread1->set_buffers(_buffer1, _buffer2);
-        _thread2->set_buffers(_buffer2, _buffer1);
+
+        _thread2->set_buffers(_buffer2, _buffer1);       
+    
+        }
+        catch(const std::exception& e)
+        {
+            std::stringstream sss;
+            sss << e.what();
+            beluga_utils::debug_print_loop_forever(sss.str());
+        }
+        
 
 
+        Serial.println("FInished dualthread init");
         return true;           
     }
 

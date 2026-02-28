@@ -23,9 +23,9 @@ namespace beluga_core
         bool connect_automatically_ok = _ini_ptr->get_config_value(_config_file_section, connect_automatically_key, &connect_automatically_str );
         bool max_connection_attempts_ok = _ini_ptr->get_config_value(_config_file_section, max_connect_attempts_key, &max_connect_attempts_str );
     
-    if(max_connection_attempts_ok)
+        if(max_connection_attempts_ok)
         {
-            _max_connect_attempts = stoi(max_connect_attempts_str);
+            _max_connect_attempts = beluga_utils::string_to_int(max_connect_attempts_str);
         }else{
             _max_connect_attempts = 10;
         }
@@ -66,7 +66,6 @@ namespace beluga_core
         int tries_tally = 0;
         WiFi.mode(WIFI_STA);
         WiFi.begin(_wifi_network_name.c_str(), _wifi_password.c_str());
-
 
         while (WiFi.status() != WL_CONNECTED) {
         delay(250);

@@ -1,6 +1,6 @@
 #include "beluga_deepsleep.h"
 #include "Arduino.h"
-
+#include "beluga_debug.h"
 //====Deepsleep variables====
 RTC_DATA_ATTR uint16_t boot_count;
 
@@ -14,8 +14,19 @@ namespace beluga_core
         using std::swap;
 
         swap(static_cast<mechanism<uint16_t> &>(first), static_cast<mechanism<uint16_t> &>(second));
+        swap(first._wake_dt_ms, second._wake_dt_ms);
+        swap(first._wake_iterations, second._wake_iterations);
+        swap(first._mode, second._mode);
+        swap(first._enable_wake_button, second._enable_wake_button);
+        swap(first._wake_button_pin_number, second._wake_button_pin_number);
+        swap(first._deepsleep_immediately_when_triggered, second._deepsleep_immediately_when_triggered);
+        swap(first._wake_duration_threshold, second._wake_duration_threshold);
+        swap(first._sleep_duration_s, second._sleep_duration_s);
+        swap(first._prev_time_ms, second._prev_time_ms);
 
+        
     }
+
 
     //copy-and-swap for operator= per https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
     deepsleep& deepsleep::operator=(deepsleep other) 
@@ -24,43 +35,52 @@ namespace beluga_core
         return *this;
     }
 
-    
-    bool deepsleep::read_config()
+    bool deepsleep::read_config_sleep_duration()
     {
-        beluga_core::device::read_config();
 
-        add_new_value("duration_mode");
+        std::string sleep_duration_s_str;
+        bool sleep_duration_s_ok =  _ini_ptr->get_config_value(_config_file_section, "sleep_duration_s", &sleep_duration_s_str);
+        if(sleep_duration_s_ok)
+        {
+            _sleep_duration_s = (uint16_t) beluga_utils::string_to_int(sleep_duration_s_str);
+        }
 
-        add_new_value("wake_duration_elapsed_time_s");
-        add_new_value("wake_duration_time_threshold_s");
-        
-        add_new_value("wake_iterations_count");
-        add_new_value("wake_iterations_threshold");
-        add_new_value("sleep_duration_s");
-        add_new_value("boot_count");
-        add_new_value("go_to_sleep_immediately");
+        return true;
+    }
 
-        set_value(0, "wake_iterations_count");
-        set_value(0, "wake_duration_elapsed_time_s");
-        
-        set_value(WAKE_ITERATIONS_THRESHOLD_DEFAULT, "wake_iterations_threshold");
-        set_value(WAKE_TIME_THRESHOLD_S_DEFAULT, "wake_duration_time_threshold_s");
-        set_value(SLEEP_DURATION_S_DEFAULT, "sleep_duration_s");
-        //Increment, and Copy from persistent memory -> volatile memory
-        boot_count++;
-        set_value(boot_count, "boot_count");
-        deepsleep_immediately_map[true] = SLEEP_IMMEDIATELY;
-        deepsleep_immediately_map[false] = DO_NOT_SLEEP_IMMEDIATELY;
-        set_value(deepsleep_immediately_map[true], "go_to_sleep_immediately"); //By default, sleep immediately when condition met. If False, reliant on external call to trigger sleep.
+    bool deepsleep::read_config_wake_duration()
+    {
 
-        //bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
+        std::string duration_mode_str;
+        bool duration_mode_ok = _ini_ptr->get_config_value(_config_file_section, "wake_duration_mode", &duration_mode_str);
+        std::string wake_duration_val_str;
+        bool wake_duration_val_ok = _ini_ptr->get_config_value(_config_file_section, "wake_duration", &wake_duration_val_str);
 
-  
+        if(duration_mode_ok && wake_duration_val_ok)
+        {
+            if(duration_mode_str == "n_iterations")
+            {
+                _mode = deepsleep_wake_duration_mode::n_iterations;
+                _wake_duration_threshold = beluga_utils::string_to_int(wake_duration_val_str);
+            }else if(duration_mode_str == "duration_s")
+            {
+                _mode = deepsleep_wake_duration_mode::duration_s;
+                _wake_duration_threshold = beluga_utils::string_to_int(wake_duration_val_str);
+            }else{
+                beluga_utils::debug_print_loop_forever("Something went wrong setting wake_duration_mode: unrecognised value.");
+            }
+        }
+        return true;
+    }
+
+    bool deepsleep::read_config_wake_button()
+    {
+        //Wakeup methods
         std::string enable_wake_button_val_str;
         bool enable_wake_button_ok = _ini_ptr->get_config_value(_config_file_section, "enable_wake_button", &enable_wake_button_val_str );
         if(enable_wake_button_ok)
         {
-            bool _enable_wake_button = beluga_utils::string_to_bool(enable_wake_button_val_str);
+            _enable_wake_button = beluga_utils::string_to_bool(enable_wake_button_val_str);
             if(_enable_wake_button)
             {
                 std::string wake_button_pin_number_str;
@@ -69,84 +89,41 @@ namespace beluga_core
                 {
                     _wake_button_pin_number = beluga_utils::string_to_int(wake_button_pin_number_str);
                     pinMode(_wake_button_pin_number, INPUT);
-
+                }else{
+                    beluga_utils::debug_print_loop_forever("Error reading wake_button_pin_number");
                 }
             }
         }
-
-        //Two possible ways to define wake duration: iterations and time. Time is default
-        bool got_wake_iterations_threshold = false;
-        bool got_wake_time_threshold = false;
-        bool wake_iterations_threshold_ok = false;
-        std::string wake_time_threshold_str;
-        bool wake_time_threshold_ok = _ini_ptr->get_config_value(_config_file_section, "wake_duration_time_threshold_s", &wake_time_threshold_str);
-        if(wake_time_threshold_ok)
-        {
-            set_value(deepsleep_duration_mode::time_duration, "duration_mode");
-            _mode = deepsleep_duration_mode::time_duration;
-            set_value(beluga_utils::string_to_int(wake_time_threshold_str), "wake_duration_time_threshold_s");
-        }else{
-            std::string wake_iterations_threshold_str;
-            wake_iterations_threshold_ok =  _ini_ptr->get_config_value(_config_file_section, "wake_iterations_threshold", &wake_iterations_threshold_str );
-            if(wake_iterations_threshold_ok)
-            {
-                
-                set_value(deepsleep_duration_mode::iteration_duration, "duration_mode");
-                _mode = deepsleep_duration_mode::iteration_duration;
-                set_value(beluga_utils::string_to_int(wake_iterations_threshold_str), "wake_iterations_threshold");
-            }
-        }
-        if((! wake_time_threshold_ok) && (! wake_iterations_threshold_ok))
-        {
-            debug_print_loop_forever("deepsleep: no wake duration set in either seconds or iterations. Config must have either wake_duration_time_threshold_s or wake_iterations_threshold");
-        }
+        return true;
+    }
     
-        std::string sleep_duration_s_str; //Note: seconds
-        bool sleep_duration_s_ok =  _ini_ptr->get_config_value(_config_file_section, "sleep_duration_s", &sleep_duration_s_str );
-        if(sleep_duration_s_ok)
+    bool deepsleep::read_config()
+    {
+        beluga_core::device::read_config();
+
+        read_config_sleep_duration();
+        read_config_wake_duration();
+        read_config_wake_button();
+
+        std::string deepsleep_immediately_when_triggered_str;
+        bool deepsleep_immediately_when_triggered_ok = _ini_ptr->get_config_value(_config_file_section, "deepsleep_immediately_when_triggered", &deepsleep_immediately_when_triggered_str );
+        if(deepsleep_immediately_when_triggered_ok)
         {
-            set_value(beluga_utils::string_to_int(sleep_duration_s_str), "sleep_duration_s");
-        }else{
-            debug_print_loop_forever("deepsleep: no sleep_duration_s set in the config file.");
+            bool do_sleep_immediately = beluga_utils::string_to_bool(deepsleep_immediately_when_triggered_str);
+            _deepsleep_immediately_when_triggered = do_sleep_immediately;
         }
 
-        std::string sleep_immediately_on_timeout_str;
-        bool sleep_immediately_on_timeout_ok = _ini_ptr->get_config_value(_config_file_section, "sleep_immediately_on_timeout", &sleep_duration_s_str );
-        if(sleep_immediately_on_timeout_ok)
-        {
-            bool do_sleep_immediately = beluga_utils::string_to_bool(sleep_duration_s_str);
-            set_value(deepsleep_immediately_map[do_sleep_immediately], "go_to_sleep_immediately");
-        }
-
-        print_wakeup_reason();
+        std::string reason;
+        get_wakeup_reason(reason);
+        Serial.println(reason.c_str());
 
         configure_deepsleep();
-
+        _prev_time_ms = millis();
         return true;
     }
 
 
-    /*
-    Method to print the reason by which ESP32
-    has been awaken from sleep
 
-    Copied verbatime from example
-    */
-    void deepsleep::print_wakeup_reason(){
-        esp_sleep_wakeup_cause_t wakeup_reason;
-
-        wakeup_reason = esp_sleep_get_wakeup_cause();
-        
-        switch(wakeup_reason)
-        {
-            case ESP_SLEEP_WAKEUP_EXT0 : Serial.println("Wakeup caused by external signal using RTC_IO"); break;
-            case ESP_SLEEP_WAKEUP_EXT1 : Serial.println("Wakeup caused by external signal using RTC_CNTL"); break;
-            case ESP_SLEEP_WAKEUP_TIMER : Serial.println("Wakeup caused by timer"); break;
-            case ESP_SLEEP_WAKEUP_TOUCHPAD : Serial.println("Wakeup caused by touchpad"); break;
-            case ESP_SLEEP_WAKEUP_ULP : Serial.println("Wakeup caused by ULP program"); break;
-            default : Serial.printf("Wakeup was not caused by deep sleep: %d\n",wakeup_reason); break;
-        }
-    }
 
     bool deepsleep::get_wakeup_reason(std::string & return_val){
         esp_sleep_wakeup_cause_t wakeup_reason;
@@ -192,16 +169,10 @@ namespace beluga_core
         we configure the wake up source
         We set our ESP32 to wake up every _SLEEP_DURATION_S seconds
         */
-       uint16_t sleep_duration_s;
-       bool got_duration = get_value(sleep_duration_s, "sleep_duration_s");
-       if(! got_duration)
-       {
-        debug_print_loop_forever("Deepsleep error: could not get the sleep duration in ms!");
-       }
-        esp_sleep_enable_timer_wakeup(sleep_duration_s * s_to_us_factor);
+        esp_sleep_enable_timer_wakeup(_sleep_duration_s * us_per_s);
 
         _ss.str("");
-        _ss << "Setup ESP32 to sleep for " << sleep_duration_s << " seconds";
+        _ss << "Setup ESP32 to sleep for " << _sleep_duration_s << " seconds";
         Serial.println(_ss.str().c_str());
     }
 
@@ -211,13 +182,14 @@ namespace beluga_core
     {
         if(! _enabled)
         {
+            Serial.println("Seepsleep not enabled");
             return false;
         }
-        if(_mode == deepsleep_duration_mode::iteration_duration)
+        if(_mode == deepsleep_wake_duration_mode::n_iterations)
         {
             return run_deepsleep_iterations();
         }
-        if(_mode == deepsleep_duration_mode::time_duration )
+        if(_mode == deepsleep_wake_duration_mode::duration_s )
         {
             return run_deepsleep_time();
         }
@@ -237,29 +209,14 @@ namespace beluga_core
 
     bool deepsleep::run_deepsleep_time()
     {
-        uint16_t wake_time_s;
-        get_value(wake_time_s, "wake_duration_elapsed_time_s" );
-        beluga_core::value<uint16_t> this_wake_time_elapsed_value;
-        //We need to pull out the beluga_core::value<uint16_t> to get its timestamp
-        uint16_t this_wake_time_elapsed_s;
-        get_value(this_wake_time_elapsed_value, "wake_duration_elapsed_time_s");
-        //Extract timestamp and calculate time deltas
-        unsigned long prev_time = this_wake_time_elapsed_value.get_value_changed_time_ms();
-        unsigned long this_dt_ms = millis() - this_wake_time_elapsed_value.get_value_changed_time_ms();
-        _dt_ms += this_dt_ms;
-        this_wake_time_elapsed_value.get_value(this_wake_time_elapsed_s);
-        this_wake_time_elapsed_s += _dt_ms/1000; //ms to s conversion
-        //Save
-        set_value(this_wake_time_elapsed_s, "wake_duration_elapsed_s");
-
-        //Check for begin sleep
-        uint16_t max_wake_duration_s;
-        get_value(max_wake_duration_s, "wake_duration_time_threshold_s");
-        if(this_wake_time_elapsed_s >= max_wake_duration_s)
+        unsigned long time_now_ms = millis();
+        unsigned long this_dt_ms = time_now_ms - _prev_time_ms;
+        _prev_time_ms = time_now_ms;
+        _wake_dt_ms += this_dt_ms;
+        unsigned long time_awake_s = _wake_dt_ms / 1000;
+        if(time_awake_s >= _wake_duration_threshold)
         {
-            uint16_t sleep_immediately;
-            get_value(sleep_immediately, "go_to_sleep_immediately");
-            if(sleep_immediately)
+            if(_deepsleep_immediately_when_triggered)
             {
                 commence_deepsleep();
             }
@@ -270,21 +227,10 @@ namespace beluga_core
 
     bool deepsleep::run_deepsleep_iterations()
     {
-        uint16_t wake_iterations;
-        get_value(wake_iterations, "wake_iterations_count" );
-        //Serial.print("Wake iterations: " );
-        //Serial.println(wake_iterations);
-        wake_iterations++;
-        set_value(wake_iterations, "wake_iterations_count");
-        //Check for begin sleep
-        uint16_t max_wake_iterations;
-        get_value(max_wake_iterations, "wake_iterations_threshold");
-
-        if(wake_iterations >= max_wake_iterations)
+        _wake_iterations++;
+        if(_wake_iterations >= _wake_duration_threshold)
         {
-            uint16_t sleep_immediately;
-            get_value(sleep_immediately, "go_to_sleep_immediately");
-            if(sleep_immediately)
+            if(_deepsleep_immediately_when_triggered)
             {
                 commence_deepsleep();
             }

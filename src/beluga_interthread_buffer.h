@@ -1,5 +1,5 @@
 #pragma once
-
+#include "beluga_constants.h"
 //#include <string>
 //#include <sstream>
 //#include "Beluga_Exception.h"
@@ -25,9 +25,11 @@ namespace beluga_core
             bool run_tx();
             //void transmit_to_buffer(std::string s);
             //bool receive_from_buffer(std::string * s);
+            virtual bool initialise_tx_topic(std::string s);
+            virtual bool initialise_rx_topic(std::string s);
             
         protected:
-            uint16_t _buffer_size = 4096; //This is the default size but it can be set in the config
+            uint16_t _buffer_size = beluga_utils::interthread_buffer_size; //This is the default size but it can be set in the config
             RingbufHandle_t _buffer_handle;
         
     };

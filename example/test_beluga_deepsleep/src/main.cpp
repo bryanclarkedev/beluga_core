@@ -19,11 +19,17 @@ void setup() {
     delay(1000);
   }    
   this_deepsleep.initialise(config_file_path, "demo_deepsleep");
-  this_deepsleep.print_wakeup_reason();
+  std::string reason;
+  this_deepsleep.get_wakeup_reason(reason);
+  Serial.println(reason.c_str());
 }
 
 void loop() {
   bool b = this_deepsleep.run();
+  if(b)
+  {
+    this_deepsleep.commence_deepsleep();
+  }
   //assert(b == false);
   ss.str("");
   ss << "Iteration " << iter << " time " << (int) (millis() / 1000) << "s";

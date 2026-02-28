@@ -1,9 +1,8 @@
 #pragma once
 
-#include "beluga_device.h"
 #include "beluga_value.h"
 #include <map>
-//#include "core_enums.h"
+//#include "../../../../beluga_utils/src/beluga_type_hasher.h"
 #include "beluga_type_hasher.h"
 
 using namespace beluga_utils;
@@ -111,6 +110,20 @@ namespace beluga_core
                 \return a bool, True if the key_str exists and False if it does not.
                 */
                 virtual bool set_value(const T in_value, std::string key_str = "")
+                {
+                    for(auto iter = _values.begin(); iter != _values.end(); iter++)
+                    {
+                        if(iter->first == key_str)
+                        {
+                            //This name is valid
+                            _values[key_str].set_value(in_value);
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                virtual bool set_value(const T in_value, const char * key_str )
                 {
                     for(auto iter = _values.begin(); iter != _values.end(); iter++)
                     {

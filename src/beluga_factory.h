@@ -4,7 +4,14 @@
 #include "beluga_exceptions.h"
 #include "beluga_string.h"
 
+/*
+We use a factory class to create many different types of objects that all inherit from beluga_core::device.
 
+TODO: Make it easier to add in new device types. Right now it involves:
+- write new_device_class
+- add new_device_class to beluga_factory.cpp
+- add new device to core_object_enums_src.h
+*/
 namespace beluga_core
 {
     class factory

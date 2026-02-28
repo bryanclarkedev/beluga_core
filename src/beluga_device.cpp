@@ -1,21 +1,21 @@
 #include "beluga_device.h"
-
+#include "beluga_debug.h"
+#include "beluga_constants.h"
 namespace beluga_core
 {
-
-
     /*!
     \brief Base class 
     \author Bryan Clarke
     \date gotta check
     \details Given a config file path and config section key, initialises this device.
+    Calls read_config.
     */
     bool device::initialise(std::string config_file_path, std::string config_section)
-    {
-        Serial.println("Beluga device init");
+    {        
         _config_file_path = config_file_path;
         _config_file_section = config_section;
         _ini_ptr = std::make_shared<beluga_utils::ini_reader>(config_file_path);
+
         _ini_ptr->initialise();
 
         bool config_ok = read_config();
@@ -26,12 +26,14 @@ namespace beluga_core
     //Initialise using a given ini reader
     bool device::initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section)
     {
+
         _ini_ptr = ini;
         if(! _ini_ptr->is_initialised())
         {
             _ini_ptr->initialise();
         }
         _config_file_section = config_section;
+        _config_file_path = ini->_config_file_path;
         return read_config();
     }
 
@@ -47,17 +49,17 @@ namespace beluga_core
     */
     bool device::read_config()
     {
-        bool config_ok = false;
+        //bool config_ok = false;
         std::string config_val;
-        config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
+        /*config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
         if(config_ok)
         {
             set_serial_debug_enabled(config_val);
-        }  
-
+        }  */
+        
         bool enable_ok = false;
-        enable_ok = _ini_ptr->get_config_value(_config_file_section, "enabled", &config_val );
-        if(config_ok)
+        enable_ok = _ini_ptr->get_config_value(_config_file_section, beluga_utils::enabled_key, &config_val );
+        if(enable_ok)
         {
             set_enabled(config_val);
         }  

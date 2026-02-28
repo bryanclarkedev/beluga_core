@@ -38,7 +38,6 @@ namespace beluga_core
             value<T> & operator=(value<T> other) 
             {
                 swap(*this, other); 
-
                 return *this;
             }
 
@@ -56,7 +55,7 @@ namespace beluga_core
                 swap(first._value_changed_time_ms, second._value_changed_time_ms);
                 swap(first._value_refreshed, second._value_refreshed);
                 swap(first._value_refreshed_time_ms, second._value_refreshed_time_ms);
-                swap(first._uninitialised, second._uninitialised);
+                swap(first._initialised, second._initialised);
             }
 
             /*!
@@ -64,7 +63,7 @@ namespace beluga_core
             \arg T value is the new value
             \details This will automatically update the _value_refreshed and _value_refreshed_time_ms fields
             If the value has changed, it will also update _value_changed and _value_changed_time_ms
-            If this is the first time a value has been set, it will set _uninitialised to false
+            If this is the first time a value has been set, it will set _initialised to true
             */
             void set_value(T value)
             {
@@ -72,10 +71,10 @@ namespace beluga_core
                 _value_refreshed = true;
                 _value_refreshed_time_ms = time_now_ms;
 
-                if(_uninitialised)
+                if(! _initialised)
                 {
                     _value_changed = true;
-                    _uninitialised = false;
+                    _initialised = true;
                 }else{
                     _value_changed = _value != value;
                 }
@@ -96,7 +95,7 @@ namespace beluga_core
             */
             bool get_value(T & value)
             {
-                if(_uninitialised)
+                if(! _initialised)
                 {
                     return false; //Value has not been set
                 }
@@ -171,7 +170,7 @@ namespace beluga_core
             unsigned long _value_refreshed_time_ms = 0;
             unsigned long _value_changed_time_ms = 0;
             
-            bool _uninitialised = true;
+            bool _initialised = false;
             
     };
 }

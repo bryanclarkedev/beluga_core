@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include "beluga_device.h"
-#include "beluga_wifi_connection.h"
+//#include "beluga_wifi_connection.h"
 #include "beluga_mqtt_client.h"
 beluga_core::mqtt_client this_mqtt;
-beluga_core::wifi_connection this_wifi;
+//beluga_core::wifi_connection this_wifi;
 std::string config_file_path = "/test.ini";
 
 std::stringstream ss;
@@ -22,7 +22,7 @@ void setup() {
   }    
   //We use the LED to indicate RX message state
   pinMode(LED_BUILTIN, OUTPUT);
-  this_wifi.initialise(config_file_path, "wifi_connection1");
+  //this_wifi.initialise(config_file_path, "wifi_connection1");
   this_mqtt.initialise(config_file_path, "mqtt_client");
 }
 
@@ -77,12 +77,12 @@ void loop() {
       time_meas_ms = now;   
       
       // Convert the value to a char array
-      char tempString[15];
-      dtostrf(time_meas_ms, 1, 2, tempString);
+      char buffer[15];
+      dtostrf(time_meas_ms, 1, 2, buffer);
       Serial.print("Publishing time_meas_ms: ");
-      Serial.println(tempString);
-      //client.publish("esp32/time_meas_ms", tempString);
-      this_mqtt.send_to_mqtt("esp32/time_meas_ms", tempString);
+      Serial.println(buffer);
+      //client.publish("esp32/time_meas_ms", buffer);
+      this_mqtt.add_to_tx_queue(buffer, "beluga/esp32/demo_tx");
     }
 
 

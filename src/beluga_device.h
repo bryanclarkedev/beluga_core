@@ -47,14 +47,14 @@ namespace beluga_core
             device(const device &b) = default ;
 
             //copy-and-swap for operator= per https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
-            device & operator=(device other)
+            device & operator=(device other) noexcept 
             {
                 swap(*this, other); 
                 return *this;
             }
-        
+
             //Swap for operator=
-            friend void swap(device & first, device & second)
+            friend void swap(device & first, device & second) noexcept 
             {
                 // enable ADL (not necessary in our case, but good practice)
                 using std::swap;
@@ -63,13 +63,24 @@ namespace beluga_core
                 swap(first._initialised, second._initialised);
                 swap(first._enabled, second._enabled);
                 swap(first._iteration, second._iteration);
-        
+                swap(first._time_ms, second._time_ms);
+
                 swap(first._serial_debug_enabled, second._serial_debug_enabled);
+                swap(first._ss, second._ss);
+
                 swap(first._json_report, second._json_report);
                 swap(first._config_file_path, second._config_file_path);
                 swap(first._config_file_section, second._config_file_section);
 
+                swap(first._ini_ptr, second._ini_ptr);
+                swap(first._device_name, second._device_name);
+                swap(first._device_type_str, second._device_type_str);
                 swap(first._parent_object, second._parent_object);
+
+                swap(first._initialisation_warning, second._initialisation_warning);
+                swap(first._initialisation_error, second._initialisation_error);
+                swap(first._runtime_warning, second._runtime_warning);
+                swap(first._runtime_error, second._runtime_error);
             }
 
             void set_enabled(std::string s);
@@ -77,29 +88,27 @@ namespace beluga_core
             void set_serial_debug_enabled(std::string s);
             void set_serial_debug_enabled(bool b);
             
-
         protected:
-            bool _initialised = false;
+            bool _initialised = false; //Set to true after read_config()
+            bool _enabled = true; //If false, run() should do nothing and return immediately
+            unsigned long _iteration = 0; //Tally of times run() was called
+            unsigned long _time_ms = 0; //Stores the last time run() was called.
+
             bool _serial_debug_enabled = false;
-            bool _enabled = true;
-            unsigned long _iteration = 0;
             std::stringstream _ss;
 
             std::string _json_report = "";
             std::string _config_file_path = "";
             std::string _config_file_section = "";
 
-            //Stores the last time run() was called.
-            unsigned long _time_ms = 0;
             std::shared_ptr<beluga_utils::ini_reader> _ini_ptr;
             std::string _device_name = "";
             std::string _device_type_str = std::string(beluga_utils::type_name(this));
             std::shared_ptr<device> _parent_object = nullptr;
-            bool _initialisaton_warning = false;
+
+            bool _initialisation_warning = false;
             bool _initialisation_error = true;
             bool _runtime_warning = false;
             bool _runtime_error = false;
-
     };
-
 }

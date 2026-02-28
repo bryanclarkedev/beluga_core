@@ -25,8 +25,33 @@ namespace beluga_core
         swap(first._rx_time_ms, second._rx_time_ms);
     }
 
+    #if 0
+    bool comms::initialise(std::string config_file_path, std::string config_section)
+    {
+        Serial.println("-----Comms Init------");
+        Serial.print("Config file path: ");
+        Serial.print(config_file_path.c_str());
+        Serial.println("");
+        Serial.println("----------------------");
+        return beluga_core::device::initialise(config_file_path, config_section);
+    }
+
+    bool comms::initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section)
+    {
+        Serial.println("-----Comms Init------");
+        Serial.print("Config file path: ");
+        Serial.print(ini->_config_file_path.c_str());
+        Serial.println("");
+        Serial.println("----------------------");
+        return beluga_core::device::initialise(ini, config_section);
+    }
+    #endif
+
+
+
     bool comms::read_config()
     {
+        beluga_core::device::read_config();
         std::string tx_topics_list_val;
         std::string rx_topics_list_val;
         bool tx_topics_ok = _ini_ptr->get_config_value(_config_file_section, beluga_utils::config_tx_topics_list_key, &tx_topics_list_val );
@@ -35,7 +60,8 @@ namespace beluga_core
         if((!tx_topics_ok) && (!rx_topics_ok))
         {
             //Initialise default topics as if no tx_topics AND no rx_topics listed
-            //Basically, no named topic channels e.g. a serial connection
+            //Basically, no named topic channels e.g. a serial connection or just passing single values around
+            //If you want to have a named tx but unnamed rx (or vice versa) add "" for the required unnamed topic list
             initialise_tx_topic(beluga_utils::default_topic);
             initialise_rx_topic(beluga_utils::default_topic);
         }
@@ -55,9 +81,6 @@ namespace beluga_core
             _rx_topic_list.clear();
             for(auto iter = rx_topics.begin(); iter != rx_topics.end(); iter++)
             {
-                std::stringstream ss;
-                ss << "Reading config rx topic: " << iter->c_str();
-                beluga_utils::debug_print(ss.str());
                 _rx_topic_list.push_back(*iter);
             }
         }
@@ -123,6 +146,9 @@ namespace beluga_core
         }
         if(! skip_topic_check)
         {
+            //TODO: Think about whether topic check is necessary. It's wasting compute cycles each transmit.
+            //COuld be implemented as a map ie.. <topic, 1> and check map[this_topic], if key not present then it's new.
+            //That would probably be faster if we have a large list of topics.
             //Check if topic list exists
             bool topic_found = check_if_tx_topic_exists(topic_str);
             if(!topic_found)
@@ -190,7 +216,6 @@ namespace beluga_core
             }
         }
 
-
         if(_rx_queue[topic_str].size() > 0)
         {
             //https://stackoverflow.com/questions/68381752/how-to-move-all-elements-from-a-list-to-an-array-or-a-vector-or-anything-else#:~:text=You%20use%20the%20std%3A%3A,often%20be%20a%20lot%20faster.        for(iter = _rx_queue.begin(); iter != _rx_q
@@ -212,7 +237,6 @@ namespace beluga_core
     //Only returns one message!
     bool comms::get_rx_msg(std::string & s, std::string topic_str, bool pop_from_queue )
     {
-        
         bool return_val = false;
         try
         {
@@ -229,12 +253,13 @@ namespace beluga_core
             }
         }catch(const std::exception &exc)
         {
+            _ss << "Comms excepted: " << exc.what() ;
             // catch anything thrown within try block that derives from std::exception
-            Serial.println(exc.what());
+            Serial.println(_ss.str().c_str());
+            _ss.str("");
         }
         return return_val;
     }
-
 
     //Only returns one message!
     bool comms::get_tx_msg(std::string & s, std::string topic_str, bool pop_from_queue )
@@ -253,8 +278,6 @@ namespace beluga_core
         }
         return return_val;
     }
-
-
 
     /*
     Return a a dictionary keyed by topic name

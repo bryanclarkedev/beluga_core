@@ -3,9 +3,8 @@ This creates a few objects and runs a few tests.
 No peripherals required.
 */
 #include <Arduino.h>
-#include "beluga_device.h"
 #include "beluga_value.h"
-
+#include <sstream>
 
 //Value is quite basic, but can support both set_value() and get_value()
 beluga_core::value<int> int_value;
@@ -74,6 +73,9 @@ void setup() {
 Run the device object, print output, wait one second.
 */
 void loop() {
+  ss.str("");
+  ss << "If you see this, the device is healthy. Press the RESET button to run initial checks.";
+  Serial.println(ss.str().c_str());
   ss.str("");
   ss << " t: " << millis();
   Serial.println(ss.str().c_str());

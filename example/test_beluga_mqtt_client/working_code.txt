@@ -16,8 +16,8 @@
 #include <PubSubClient.h>
 
 // Replace the next variables with your SSID/Password combination
-const char* ssid = "GoogleMesh1";
-const char* password = "rolandpuppy";
+const char* ssid = "WifiNetworkNamePlaceholder";
+const char* password = "passwordPlaceholder";
 
 std::string client_name = "ESP32_Client";
 

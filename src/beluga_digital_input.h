@@ -1,6 +1,5 @@
 #pragma once
 
-#pragma once
 #include <string> //For stoi
 #include "beluga_mechanism.h"
 #include "beluga_gpio.h"

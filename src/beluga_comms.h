@@ -6,7 +6,7 @@
 namespace beluga_core
 {
     /*!
-    \brief This is a communications class, with queues for RX and TX
+    \brief This is a communications device class, with queues for RX and TX
     \details 
     Communications is assumed to occur on different 'topics'. The default topic is "" but some instances
     will require multiple topics that are handled differently. These must be specified in the .ini
@@ -32,10 +32,14 @@ namespace beluga_core
             //Swap for operator=
             friend void swap(comms& first, comms& second); 
 
-            //virtual bool initialise(std::string config_file_path, std::string config_section);
+            #if 0
+            virtual bool initialise(std::string config_file_path, std::string config_section);
+            virtual bool initialise(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_section);
+            #endif
+
+            
             virtual bool read_config();
 
-            void initialise_topic(std::string topic_str);
             std::string get_json_report();
             std::string get_json_report(std::string topic_name);
             virtual bool run(void * p = nullptr);
@@ -64,7 +68,7 @@ namespace beluga_core
             bool get_tx_msg(std::string & s, std::string topic_str = beluga_utils::default_topic, bool pop_from_queue = true);
 
         protected:
-            std::map<std::string, std::list<std::string> > _tx_queue;
+            std::map<std::string, std::list<std::string> > _tx_queue; //We have a map for key->per-topic-queue
             std::map<std::string, std::list<std::string> > _rx_queue;
             std::vector<std::string> _tx_topic_list;
             std::vector<std::string> _rx_topic_list;

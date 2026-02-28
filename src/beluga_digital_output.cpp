@@ -8,7 +8,6 @@ namespace beluga_core
         using std::swap;
 
         swap(static_cast<mechanism<bool> &>(first), static_cast<mechanism<bool> &>(second));
-
         swap(first._pin, second._pin);   
     }
 
@@ -24,12 +23,13 @@ namespace beluga_core
         //bool ini_ok = _ini_ptr->initialise(); //Will always be true, else the ini.initialise() will be in an endless loop of failure.
 
         bool config_ok = false;
-        std::string config_val;
-        config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
-        if(config_ok)
+
+        config_ok = beluga_core::device::read_config();
+        if(! config_ok)
         {
-            set_serial_debug_enabled(config_val);
-        }    
+            beluga_utils::debug_print_loop_forever("Could not read device config...");
+        }
+
 
         _pin.set_pin_direction(OUTPUT);
         _pin.initialise(_ini_ptr, _config_file_section);
@@ -44,7 +44,7 @@ namespace beluga_core
 
     bool digital_output::run(void * p )
     {
-        if (!_pin.get_is_configured())
+        if (! _pin.get_is_configured())
         {
             Serial.println("Digital output not configured");
             return false;

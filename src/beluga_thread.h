@@ -17,7 +17,7 @@ By default, the object's pre-run/run/post-run functions (which include comms stu
 
 There is a 'task object' which is the singular object for the thread
 
-Interprocess buffers are not included! They need to be assigned using set_buffers()
+Interprocess buffers are not included! They need to be assigned using set_buffers(). We create them as globals.
 
 The thread can be made to do useful things in a couple of ways
 - inherit beluga_core::thread, re-implement pre_run and post_run to handle comms, setpoints, states etc
@@ -31,7 +31,7 @@ The thread can be made to do useful things in a couple of ways
 */
 namespace beluga_core
 {
-    class thread : public machinery
+    class thread : public machine
     {
         public:
             thread(){};

@@ -1,4 +1,5 @@
 #include "beluga_digital_input.h"
+#include "beluga_debug.h"
 namespace beluga_core
 {
     //copy-and-sep for operator= per https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
@@ -22,13 +23,14 @@ namespace beluga_core
     bool digital_input::read_config()
     {
         bool config_ok = false;
-        std::string config_val;
-        config_ok = _ini_ptr->get_config_value(_config_file_section, "enable_serial_debug", &config_val );
-        if(config_ok)
-        {
-            set_serial_debug_enabled(config_val);
-        }    
 
+        config_ok = device::read_config();
+        if(! config_ok)
+        {
+            beluga_utils::debug_print_loop_forever("Could not read GPIO config...");
+        }
+
+        
         _pin.set_pin_direction(INPUT);
         _pin.initialise(_ini_ptr, _config_file_section);
         _pin.configure();
@@ -55,6 +57,7 @@ namespace beluga_core
             }
         }
         return true;
+        
     }
 
 }

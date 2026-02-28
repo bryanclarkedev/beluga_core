@@ -7,7 +7,7 @@
 namespace beluga_core
 {
 
-    class dualthread : public machine
+    class dualthread : public machinery
     {
         public:
             dualthread(){};

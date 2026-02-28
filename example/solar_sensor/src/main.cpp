@@ -3,8 +3,8 @@
 #include "beluga_machine.h"
 #include "beluga_deepsleep.h"
 #include "beluga_digital_output.h"
-#include "beluga_bmp280_temperature_pressure.h"
-#include "beluga_lipo_fuel_gauge.h"
+#include "beluga_temperature_pressure_bmp280.h"
+#include "beluga_li_batt_fuel_gauge_max17043.h"
 #include <iomanip> // Required for std::setprecision 
 
 beluga_core::machine this_machine;
@@ -57,7 +57,7 @@ void loop() {
   float pressure_Pa, temperature_C, altitude_m;
   bool got_pressure_ok = this_machine.get_state(temperature_pressure_name, pressure_Pa, "pressure_Pa");
   bool got_temp_ok = this_machine.get_state(temperature_pressure_name, temperature_C, "temperature_C");
-  bool got_altitude_ok = this_machine.get_state(temperature_pressure_name, altitude_m, "altitude_m");
+  //bool got_altitude_ok = this_machine.get_state(temperature_pressure_name, altitude_m, "altitude_m");
   ss.str("");
   ss << "Temperature: " << std::setprecision(2) << temperature_C << " C";
   Serial.println(ss.str().c_str());

@@ -1,7 +1,25 @@
 #include "beluga_interthread_buffer.h"
 namespace beluga_core
-    {
+{
         
+    //We overide the base class. The only topic we allow is "".
+    bool interthread_buffer::initialise_tx_topic(std::string topic_str)
+    {
+        if(topic_str != "")
+        {
+            return false;
+        }
+        return beluga_core::comms::initialise_tx_topic(topic_str);
+    }
+
+    bool interthread_buffer::initialise_rx_topic(std::string topic_str)
+    {
+        if(topic_str != "")
+        {
+            return false;
+        }
+        return beluga_core::comms::initialise_rx_topic(topic_str);
+    }
     /*!
     Config variables:
     buffer size: int16_t
@@ -14,6 +32,10 @@ namespace beluga_core
     */
     bool interthread_buffer::read_config()
     {
+        //This will initialise default topics
+        bool read_ok = beluga_core::comms::read_config();
+        
+        
         //beluga_core::comms::initialise(_config_file_path, _config_file_section);
 
         //Initialise default topics

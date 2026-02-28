@@ -6,16 +6,14 @@ Call start_thread to get it set up
 This creates the thread and starts it running 
 It calls task_function 
 
+Some of this is from https://randomnerdtutorials.com/esp32-dual-core-arduino-ide/
 */
-
 namespace beluga_core
 {
-
     //copy-and-swap for operator= per https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
     thread& thread::operator=(thread other)
     {
         swap(*this, other); 
-
         return *this;
     }
 
@@ -36,9 +34,6 @@ namespace beluga_core
         swap(first._core_id, second._core_id);
         swap(first._stack_size_bytes, second._stack_size_bytes);
         swap(first._thread_started, second._thread_started);
-        //swap(first._machinery_ptr, second._machinery_ptr);
-        //swap(first._machinery_name, second._machinery_name);
-
 
     }
 
@@ -63,20 +58,25 @@ namespace beluga_core
         {
             _task_name = task_name_val;
         }
+        //ESP32 has two cores, 0 and 1. Threads are mapped to one.
         std::string task_core_key("task_core");
         std::string task_core_val;
         bool task_core_ok = _ini_ptr->get_config_value(_config_file_section, task_core_key, &task_core_val );
         if(task_core_ok)
         {
-            _core_id = stoi(task_core_val);
+            Serial.println("---");
+            Serial.println(task_core_val.c_str());
+            _core_id = beluga_utils::string_to_int(task_core_val);
+        }else{
+            beluga_utils::debug_print("Could not get core id!");
         }
-
+        //Memory is finite. Allocate a stack size.
         std::string stack_size_key("stack_size_bytes");
         std::string stack_size_val;
         bool stack_size_ok = _ini_ptr->get_config_value(_config_file_section, stack_size_key, &stack_size_val);
         if(stack_size_ok)
         {
-            _stack_size_bytes = stoi(stack_size_val);
+            _stack_size_bytes = beluga_utils::string_to_int(stack_size_val);
         }
         /*
         std::string task_object_name_key("task_object");
@@ -133,6 +133,9 @@ namespace beluga_core
 
     }
 
+    /*
+    This is mostly boilerplate from https://randomnerdtutorials.com/esp32-dual-core-arduino-ide/
+    */
     bool thread::start_thread()
     {
         if(_thread_started)
@@ -267,8 +270,13 @@ namespace beluga_core
 
     bool thread::set_buffers(std::shared_ptr<beluga_core::interthread_buffer> rx_buffer, std::shared_ptr<beluga_core::interthread_buffer> tx_buffer )
     {
+        Serial.println("111");
         _rx_buffer = rx_buffer;
+                Serial.println("222");
+
         _tx_buffer = tx_buffer;
+                Serial.println("333");
+
         return true;
     }
 }
