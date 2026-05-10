@@ -1,11 +1,12 @@
 #pragma once
 
+
 #include <sstream>
 #include <string>
 #include "Arduino.h"
 #include "beluga_string.h"
 #include "beluga_ini_reader.h"
-#include "beluga_type_hasher.h"
+#include "beluga_type_hasher.h" //Probably redundant
 #include <memory> //For shared_ptr
 
 namespace beluga_core
