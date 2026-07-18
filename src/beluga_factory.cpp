@@ -4,7 +4,7 @@
 #include "beluga_digital_input.h"
 #include "beluga_digital_output.h"
 #include "beluga_deepsleep.h"
-#include "beluga_dualthread.h"
+//#include "beluga_dualthread.h"
 #include "beluga_thread.h"
 #include "beluga_interthread_buffer.h"
 #include "beluga_rtc_sd2405.h"
@@ -62,10 +62,10 @@ namespace beluga_core
             {
                 return std::make_shared<interthread_buffer>();
             }
-            case beluga_core_object_enum::dualthread:
+            /*case beluga_core_object_enum::dualthread:
             {
                 return std::make_shared<dualthread>();
-            }  
+            }  */
             case beluga_core_object_enum::wifi_connection:
             {
                 return std::make_shared<wifi_connection>();

@@ -220,6 +220,20 @@ namespace beluga_core
     
     bool mqtt_client::run(void * p )
     {
+        if (!_mqtt_client.connected()) {
+            Serial.println("Not connected!");
+            attempt_wifi_reconnect();
+            if(_mqtt_client.connected()){
+                Serial.println("Connected!");
+            }else{
+                return false;
+            }
+        }
+        //Run MQTT client. This will call the callback!
+        _mqtt_client.loop();
+        return true;
+
+        #if 0
           if (!_mqtt_client.connected()) {
             Serial.println("Not connected!");
             attempt_wifi_reconnect();
@@ -236,11 +250,22 @@ namespace beluga_core
             run_rx();
           }
           return true;
+          #endif
     }
 
     
     bool mqtt_client::run_rx()
     {
+        if (!_mqtt_client.connected()) {
+            Serial.println("Not connected!");
+            attempt_wifi_reconnect();
+            if(_mqtt_client.connected()){
+                Serial.println("Connected!");
+            }else{
+                return false;
+            }
+        }
+
         for(auto iter = mqtt_client::mqtt_callback_rx_data.begin(); iter != mqtt_client::mqtt_callback_rx_data.end(); iter++)
         {
             std::string topic_str = iter->first;
@@ -266,6 +291,16 @@ namespace beluga_core
 
     bool mqtt_client::run_tx()
     {
+        if (!_mqtt_client.connected()) {
+            Serial.println("Not connected!");
+            attempt_wifi_reconnect();
+            if(_mqtt_client.connected()){
+                Serial.println("Connected!");
+            }else{
+                return false;
+            }
+        }
+
             for(auto iter = _tx_queue.begin(); iter != _tx_queue.end(); iter++)
             {
                 std::string topic_str = iter->first;

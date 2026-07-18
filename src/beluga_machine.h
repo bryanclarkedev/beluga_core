@@ -3,6 +3,7 @@
 //#include "extended_factory.h"
 #include "beluga_ini_reader.h"
 #include "beluga_factory.h"
+#include "beluga_comms.h"
 
 namespace beluga_core
 {
@@ -30,6 +31,42 @@ namespace beluga_core
             virtual bool read_config();
             virtual bool get_factory(std::shared_ptr<beluga_core::factory> this_factory);
             virtual bool run(void * p = nullptr);
+            
+            virtual bool send_to_tx(std::string subdevice_name, std::string topic_str, std::string payload_str){
+                try
+                {
+                    std::shared_ptr<beluga_core::comms> comms_ptr = std::static_pointer_cast<beluga_core::comms>(_subdevices[subdevice_name]);
+                    comms_ptr->add_to_tx_queue(payload_str, topic_str);            
+                }
+                catch(const std::exception& e)
+                {
+                    Serial.print("Error in send_to_tx for subdevice ");
+                    Serial.print(subdevice_name.c_str());
+                    Serial.print(" topic ");
+                    Serial.println(topic_str.c_str());
+                    return false;
+                }
+                return true;
+            }
+            virtual bool check_for_rx(std::string subdevice_name, std::string topic_str, std::list<std::string> return_rx_list)
+            {
+                try
+                {
+                    std::shared_ptr<beluga_core::comms> comms_ptr = std::static_pointer_cast<beluga_core::comms>(_subdevices[subdevice_name]);
+                    bool got_rx_ok = comms_ptr->get_rx_queue(return_rx_list, topic_str );
+                    return got_rx_ok;
+                }
+                catch(const std::exception& e)
+                {
+                    Serial.print("Error in check_for_rx for subdevice ");
+                    Serial.print(subdevice_name.c_str());
+                    Serial.print(" topic ");
+                    Serial.println(topic_str.c_str());
+                    return false;
+                }
+
+            }
+
 
             template<typename T>
             bool set_value(std::string mechanism_name, T t, std::string value_name = "")
@@ -111,11 +148,13 @@ namespace beluga_core
                 return t_ptr->run();
             }
 
+
+
         protected:
             std::map<std::string, std::shared_ptr<beluga_core::device> > _subdevices;
             std::vector<std::string> _subdevice_names;
             std::vector<std::string> _subdevice_types;
-
+            std::vector<std::string> _comms_names;
 
 
             //bool get_config_list_field(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_key, std::vector<std::string> & results_vec, std::string delim=",");

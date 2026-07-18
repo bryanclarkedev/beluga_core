@@ -1,5 +1,5 @@
 #include "beluga_machine.h"
-
+#include "beluga_comms.h"
 namespace beluga_core
 {
 
@@ -163,7 +163,14 @@ namespace beluga_core
             Serial.print("Initialised subdevice ");
             Serial.print(subdevice_name.c_str());
             Serial.print(" type ");
-            Serial.println(subdevice_type.c_str());
+            Serial.print(subdevice_type.c_str());
+            Serial.print(" (is comms: ");
+            Serial.print(device_ptr->get_is_comms());
+            Serial.println(")");
+
+            if(device_ptr->get_is_comms()){
+                _comms_names.push_back(subdevice_name);
+            }
             return true;
         }else{
             Serial.print("Error initialising subdevice ");
@@ -188,12 +195,27 @@ namespace beluga_core
 
     bool machine::run(void * p)
     {
-        
-        //Run devices
+        //Run comms rx
+        for(auto comms_iter = _comms_names.begin(); comms_iter != _comms_names.end(); comms_iter++)
+        {
+            std::shared_ptr<beluga_core::comms> comms_ptr = std::static_pointer_cast<beluga_core::comms>(_subdevices[*comms_iter]);
+            comms_ptr->run_rx();
+        }
+        //Run devices (including comms)
         for(auto subdevice_iter = _subdevices.begin(); subdevice_iter != _subdevices.end(); subdevice_iter++)
         {
             subdevice_iter->second->run(p);
         }
+
+        //Run comms tx
+        for(auto comms_iter = _comms_names.begin(); comms_iter != _comms_names.end(); comms_iter++)
+        {
+            std::shared_ptr<beluga_core::comms> comms_ptr = std::static_pointer_cast<beluga_core::comms>(_subdevices[*comms_iter]);
+            comms_ptr->run_tx();
+        }
+
+
+
         
         return true;
     }

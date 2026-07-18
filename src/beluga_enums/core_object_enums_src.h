@@ -22,7 +22,7 @@ ENUMITEM(deepsleep)
 
 ENUMITEM(thread)
 ENUMITEM(interthread_buffer)
-ENUMITEM(dualthread)
+//ENUMITEM(dualthread)
 
 //ENUMITEM(mqtt_client_machinery)
 //ENUMITEM(led_machinery)

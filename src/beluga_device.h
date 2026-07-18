@@ -82,13 +82,15 @@ namespace beluga_core
                 swap(first._initialisation_error, second._initialisation_error);
                 swap(first._runtime_warning, second._runtime_warning);
                 swap(first._runtime_error, second._runtime_error);
+
+                swap(first._is_comms, second._is_comms);
             }
 
             void set_enabled(std::string s);
             void set_enabled(bool b);
             void set_serial_debug_enabled(std::string s);
             void set_serial_debug_enabled(bool b);
-            
+            virtual bool get_is_comms(){return _is_comms;}
         protected:
             bool _initialised = false; //Set to true after read_config()
             bool _enabled = true; //If false, run() should do nothing and return immediately
@@ -111,5 +113,7 @@ namespace beluga_core
             bool _initialisation_error = true;
             bool _runtime_warning = false;
             bool _runtime_error = false;
+
+            bool _is_comms = false;
     };
 }

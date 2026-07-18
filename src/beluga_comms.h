@@ -66,6 +66,7 @@ namespace beluga_core
             void clear_rx_queue(std::string topic_str = beluga_utils::default_topic);
 
             bool get_tx_msg(std::string & s, std::string topic_str = beluga_utils::default_topic, bool pop_from_queue = true);
+            virtual bool get_is_comms(){return _is_comms;}
 
         protected:
             std::map<std::string, std::list<std::string> > _tx_queue; //We have a map for key->per-topic-queue
@@ -77,7 +78,6 @@ namespace beluga_core
             std::map<std::string, unsigned long int> _tx_time_ms;
 
             //Fields for reading the config file
-   
-            
+            bool _is_comms = true;
     };
 }

@@ -311,17 +311,17 @@ namespace beluga_core
 
     bool comms::run(void * p)
     {
-        _time_ms = millis();
-        run_rx();
-        run_tx();
+        //_time_ms = millis();
+        //run_rx();
+        //run_tx();
         return true;
     }
 
     bool comms::run(std::string topic_str)
     {
         _time_ms = millis();
-        run_rx(topic_str);
-        run_tx(topic_str);
+        //run_rx(topic_str);
+        //run_tx(topic_str);
         return true;
     }
 

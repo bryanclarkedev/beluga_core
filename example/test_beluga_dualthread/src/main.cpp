@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include "beluga_device.h"
-#include "beluga_dualthread.h"
+#include "beluga_machinery.h"
 beluga_core::device this_device;
 
-beluga_core::dualthread dualthread_app;
+beluga_core::machinery dualthread_app;
 
 std::string config_file_path = "/test.ini";
 
@@ -19,7 +19,7 @@ void setup() {
     delay(1000);
   }    
   //this_device.initialise(config_file_path, "demo_device");
-  dualthread_app.initialise(config_file_path, "dualthread_demo");
+  dualthread_app.initialise(config_file_path, "machinery_demo");
 }
 
 void loop() {

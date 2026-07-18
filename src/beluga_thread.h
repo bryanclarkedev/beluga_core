@@ -2,7 +2,6 @@
 
 #include "beluga_machine.h"
 #include "beluga_interthread_buffer.h"
-#include "beluga_machinery.h"
 
 /*
 A beluga_core::thread is a special type of machine
