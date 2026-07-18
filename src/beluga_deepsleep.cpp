@@ -161,16 +161,26 @@ namespace beluga_core
         RTC peripherals to be turned on.
         */
         //button 1 is unpressed, button 0 is pressed
+
+        #if ESP32C3
+        if(_enable_wake_button == true)
+        {
+            esp_deep_sleep_enable_gpio_wakeup(1 << 9,ESP_GPIO_WAKEUP_GPIO_HIGH);
+        }
+        esp_sleep_enable_timer_wakeup(_sleep_duration_s * us_per_s);
+
+        #else
+        
         if(_enable_wake_button == true)
         {
             esp_sleep_enable_ext0_wakeup((gpio_num_t) _wake_button_pin_number,0); //1 = High (unpressed), 0 = Low (pressed)
-        }
+        }        
         /*
         we configure the wake up source
         We set our ESP32 to wake up every _SLEEP_DURATION_S seconds
         */
         esp_sleep_enable_timer_wakeup(_sleep_duration_s * us_per_s);
-
+        #endif
         _ss.str("");
         _ss << "Setup ESP32 to sleep for " << _sleep_duration_s << " seconds";
         Serial.println(_ss.str().c_str());

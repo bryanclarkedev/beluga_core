@@ -1,6 +1,6 @@
 #pragma once
 #include "beluga_device.h"
-#include <Wifi.h>
+#include <WiFi.h>
 
 #include <vector>
 

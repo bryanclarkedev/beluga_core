@@ -168,10 +168,15 @@ namespace beluga_core
         }
         
         //------------------Wifi config-------------
-        std::string wifi_network_key("wifi_network_name");
-        std::string wifi_password_key("wifi_password");
-        bool wifi_network_ok = _ini_ptr->get_config_value(_config_file_section, wifi_network_key, &_wifi_network_name );
-        bool wifi_password_ok = _ini_ptr->get_config_value(_config_file_section, wifi_password_key, &_wifi_password );
+        //Read from environment variable
+        //std::string wifi_network_key("wifi_network_name");
+        //std::string wifi_password_key("wifi_password");
+        //bool wifi_network_ok = _ini_ptr->get_config_value(_config_file_section, wifi_network_key, &_wifi_network_name );
+        //bool wifi_password_ok = _ini_ptr->get_config_value(_config_file_section, wifi_password_key, &_wifi_password );
+        _wifi_network_name = _WIFI_SSID;
+        _wifi_password = _WIFI_PASSWORD;
+        bool wifi_network_ok = _wifi_network_name != "";
+        bool wifi_password_ok = _wifi_password != "";
         assert(wifi_network_ok);
         assert(wifi_password_ok);
 
@@ -218,8 +223,11 @@ namespace beluga_core
           if (!_mqtt_client.connected()) {
             Serial.println("Not connected!");
             attempt_wifi_reconnect();
+            if(_mqtt_client.connected()){
+                Serial.println("Connected!");
+            }
           }else{
-            Serial.println("Connected!");
+            //Serial.println("Connected!");
             //Load into outgoing
             run_tx();
             //Run MQTT client. This will call the callback!
@@ -247,7 +255,8 @@ namespace beluga_core
                     topic_str = prefix_deleted_str;
                 }
             }
-
+            //Serial.println("Added to rx queue");
+            //Serial.println(topic_str.c_str());
             add_to_rx_queue(payload_str, topic_str);
         }
         mqtt_client::mqtt_callback_rx_data.clear();

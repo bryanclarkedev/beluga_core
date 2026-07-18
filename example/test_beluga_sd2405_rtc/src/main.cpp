@@ -5,11 +5,11 @@
 #include <sstream>
 #include "beluga_debug.h"
 #include "beluga_ini_reader.h"
-#include "beluga_sd2405_rtc.h"
+#include "beluga_rtc_sd2405.h"
 
 std::string config_file_path = "/test.ini";
 beluga_utils::ini_reader this_ini(config_file_path);
-beluga_core::sd2405_rtc this_rtc;
+beluga_core::rtc_sd2405 this_rtc;
 std::stringstream ss;
 
 

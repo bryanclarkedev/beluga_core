@@ -145,6 +145,7 @@ namespace beluga_core
             Serial.print(subdevice_name.c_str());
             Serial.print(" type ");
             Serial.println(subdevice_type.c_str());
+            Serial.println(">>>>Check the subdevice type label is not misspelt!");
             return false;
         }
         device_ptr->set_parent(std::shared_ptr<beluga_core::device>(this));

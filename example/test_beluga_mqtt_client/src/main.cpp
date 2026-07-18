@@ -2,6 +2,19 @@
 #include "beluga_device.h"
 //#include "beluga_wifi_connection.h"
 #include "beluga_mqtt_client.h"
+
+/*
+To use this:
+- configure the WiFi network and password in data/test.ini.
+- pick a uniue MQTT client name (if you reuse the name you'll disconnect a bunch when others connect with the same name)
+- Optional: configure the MQTT broker address and port (default is 1883, hivemq free one is 8884)
+- Program the ESP32
+- connect to the MQTT previewer (I use https://www.hivemq.com/demos/websocket-client/)
+- publish 'on' or 'off' (case-sensitive) to beluga/esp32/demo_rx
+- subscribe to beluga/esp32/demo_tx
+*/
+
+
 beluga_core::mqtt_client this_mqtt;
 //beluga_core::wifi_connection this_wifi;
 std::string config_file_path = "/test.ini";
@@ -30,7 +43,7 @@ void setup() {
 void handle_rx()
 {
     std::list<std::string> this_rx_list;
-    std::string this_topic_str = "beluga/esp32/output";
+    std::string this_topic_str = "beluga/esp32/demo_rx";
     this_mqtt.get_rx_queue(this_rx_list, this_topic_str);
     if(this_rx_list.size() > 0)
     {

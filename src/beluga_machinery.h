@@ -11,7 +11,7 @@ Value map: has map of values
 comms: device with additional comms functions (run_tx, run_rx, add_to_tx_queue, add_to_rx_queue)
 
 Mechanism: device AND value map
-Machine: device with list of devices AND list of comms
+Machine: device with list of devices 
 Machinery: machine with a list of commas (as well as a list of devices)
 Sometimes only the devices will be used, sometimes only the comms will be used, sometimes both will be used
 
