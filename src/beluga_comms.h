@@ -40,8 +40,8 @@ namespace beluga_core
             
             virtual bool read_config();
 
-            std::string get_json_report();
-            std::string get_json_report(std::string topic_name);
+            std::string get_report_string();
+            std::string get_report_string(std::string topic_name);
             virtual bool run(void * p = nullptr);
             virtual bool run(std::string topic_str);
             

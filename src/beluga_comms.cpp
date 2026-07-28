@@ -280,9 +280,10 @@ namespace beluga_core
     }
 
     /*
-    Return a a dictionary keyed by topic name
+    Return a string containing useful info
+    Typically I would do a JSON string
     */
-    std::string comms::get_json_report()
+    std::string comms::get_report_string()
     {
         _ss.str("");
         _ss << "{\"time_ms\": " << _time_ms;
@@ -290,7 +291,7 @@ namespace beluga_core
         for(auto iter = _tx_topic_list.begin(); iter != _channel_list.end(); iter++)
         {
             _ss << ", \"" << *iter << "\": "
-            _ss << get_json_report[*iter];
+            _ss << get_report_string[*iter];
             if(*iter != _channel_list[-1])
             {
                 _ss << ", ";
@@ -302,7 +303,7 @@ namespace beluga_core
     }
 
 
-    std::string comms::get_json_report(std::string topic_str)
+    std::string comms::get_report_string(std::string topic_str)
     {
         _ss.str("");
         _ss << "{\"time_ms\": " << _time_ms << ", \"_rx_time_ms\": " << _rx_time_ms[topic_str] << ", \"_tx_time_ms\": " << _tx_time_ms[topic_str] <<"}";

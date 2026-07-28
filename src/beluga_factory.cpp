@@ -12,7 +12,8 @@
 #include "beluga_mqtt_client.h"
 #include "beluga_li_batt_fuel_gauge_max17043.h"
 #include "beluga_temperature_pressure_bmp280.h"
-
+#include "beluga_nexus.h"
+#include "beluga_mqtt_nexus.h"
 
 /*
 
@@ -86,6 +87,14 @@ namespace beluga_core
             {
                 return std::make_shared<temperature_pressure_bmp280>();
             }  
+            case beluga_core_object_enum::nexus:
+            {
+                return std::make_shared<nexus>();
+            } 
+            case beluga_core_object_enum::mqtt_nexus:
+            {
+                return std::make_shared<mqtt_nexus>();
+            }                           
             default:
             {
                 throw_line("Bad object type enum in beluga_factory!!!!");

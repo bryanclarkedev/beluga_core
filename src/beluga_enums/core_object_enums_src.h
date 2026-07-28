@@ -19,6 +19,8 @@ ENUMITEM(mqtt_server)
 //ENUMITEM(wifi_manager)
 
 ENUMITEM(deepsleep)
+ENUMITEM(nexus)
+ENUMITEM(mqtt_nexus)
 
 ENUMITEM(thread)
 ENUMITEM(interthread_buffer)

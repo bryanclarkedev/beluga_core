@@ -19,14 +19,20 @@ There is a 'task object' which is the singular object for the thread
 Interprocess buffers are not included! They need to be assigned using set_buffers(). We create them as globals.
 
 The thread can be made to do useful things in a couple of ways
-- inherit beluga_core::thread, re-implement pre_run and post_run to handle comms, setpoints, states etc
+- inherit beluga_core::thread, re-implement pre_run and post_run
 -- No need to re-implement run(), just leave it to run all subdevices with the pre_run and post_run functions
-    to handle the rest
+    to handle the comms (including interthread), setpoints, state reporting
 - inherit beluga_core::thread, re-implement run()
--- pre_run and post_run are redundant here
+-- assumes pre_run and post_run are redundant
 - have just one subdevice which itself contains all the other subdevices and has a custom run(). 
 -- It gets passed the void * params which points to the parent thread
 -- so this object can static_cast the pointer and then access the interthread buffers and manage comms etc
+This class has a rx_buffer and tx_buffer element for talking to another thread.
+
+Since the thread inherits from machine, the thread can contain a list of subdevices, as well as being a device itself.
+You can add stuff into the thread's run() 
+
+Optionally the thread can contain a single nexus which is used as a wrapper around all devices
 */
 namespace beluga_core
 {
@@ -48,6 +54,7 @@ namespace beluga_core
             bool set_buffers(std::shared_ptr<beluga_core::interthread_buffer> rx_buffer, std::shared_ptr<beluga_core::interthread_buffer> tx_buffer );
 
             std::string _task_name = "beluga_thread";
+            //Buffers are public variables to allow child machine to reach up and access them.
             std::shared_ptr<beluga_core::interthread_buffer> _rx_buffer = nullptr;
             std::shared_ptr<beluga_core::interthread_buffer> _tx_buffer = nullptr;
             virtual bool pre_run(void * params = nullptr);//{ return true; } //Inheriting class should do comms_rx etc in here.

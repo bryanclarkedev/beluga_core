@@ -8,6 +8,7 @@
 #include "beluga_ini_reader.h"
 #include "beluga_type_hasher.h" //Probably redundant
 #include <memory> //For shared_ptr
+#include <utility>
 
 namespace beluga_core
 {
@@ -17,7 +18,7 @@ namespace beluga_core
     - initialise
     - read_config()
     - run()
-    - get_json_report()
+    - get_report_string()
     */
     class device
     {
@@ -30,6 +31,16 @@ namespace beluga_core
             {
                 _parent_object = this_parent_ptr;
             }
+
+            virtual void generate_report_string(){
+                _ss.str("");
+                _ss << "{\"timestamp\": " << millis();
+                std::string b = _enabled ? "true" : "false"; 
+                _ss << ", \"enabled\": " <<  b;
+                _ss  << "}" ;
+                _report_string = _ss.str();
+                _ss.str("");
+            }
             /*
             TODO: set_debug_print_enabled
             debug_print (call beluga_utils::debug_print(s, force) with force from beluga_core::device._debug_print )
@@ -41,8 +52,13 @@ namespace beluga_core
             If you don't have a really good reason, don't pass anything in, just leave it as nullptr.
             You have been warned.
             */
-            virtual bool run(void * p = nullptr){return _enabled;}
-            virtual std::string get_json_report(){return "";}
+            virtual bool run(void * p = nullptr){
+   
+                generate_report_string();
+                return _enabled;
+            }
+
+            virtual std::string get_report_string(){return _report_string;}
             
             //Copy constructor
             device(const device &b) = default ;
@@ -69,7 +85,7 @@ namespace beluga_core
                 swap(first._serial_debug_enabled, second._serial_debug_enabled);
                 swap(first._ss, second._ss);
 
-                swap(first._json_report, second._json_report);
+                swap(first._report_string, second._report_string);
                 swap(first._config_file_path, second._config_file_path);
                 swap(first._config_file_section, second._config_file_section);
 
@@ -100,7 +116,7 @@ namespace beluga_core
             bool _serial_debug_enabled = false;
             std::stringstream _ss;
 
-            std::string _json_report = "";
+            std::string _report_string = "";
             std::string _config_file_path = "";
             std::string _config_file_section = "";
 

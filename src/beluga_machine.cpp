@@ -84,8 +84,9 @@ namespace beluga_core
         bool names_ok = _ini_ptr->get_config_list_field(_config_file_section, beluga_utils::subdevice_names_key, raw_subdevice_names);
         if(! names_ok)
         {
-            _initialisation_error = true;
-            return false;
+            //_initialisation_error = true;
+            //No subdevices.
+            return true;
         }
 
         //Now go to the config for each machine, and get its machine type

@@ -149,6 +149,36 @@ namespace beluga_core
             }
 
 
+            virtual std::list< std::pair<std::string, std::string> > get_subdevice_reports(){
+                _reports_list.clear();
+                for(auto iter = _subdevices.begin(); iter != _subdevices.end(); iter++){
+                    std::string device_name = iter->first;
+                    std::string report_str = iter->second->get_report_string();
+                    _reports_list.push_back(std::make_pair(device_name, report_str));
+                }
+                return _reports_list;
+            }
+
+            virtual void generate_report_string(){
+                std::list< std::pair<std::string, std::string> > subdevice_reports = get_subdevice_reports();
+                
+                _ss.str("");
+                _ss << "{\"timestamp\": " << millis();
+                std::string b = _enabled ? "true" : "false"; 
+                _ss << ", \"enabled\": " <<  b;
+                _ss << ", \"subdevices\": {";
+
+                //Device name: device status report key-pair.
+                for (auto iter = subdevice_reports.begin(); iter != subdevice_reports.end(); iter++) {
+                    _ss << "\"" << iter->first << "\": " << iter->second;
+                    if(iter != std::prev(subdevice_reports.end())){
+                        _ss << ", ";
+                    }
+                }
+                _ss << "}}";
+                _report_string = _ss.str();
+                return;
+            }
 
         protected:
             std::map<std::string, std::shared_ptr<beluga_core::device> > _subdevices;
@@ -156,6 +186,8 @@ namespace beluga_core
             std::vector<std::string> _subdevice_types;
             std::vector<std::string> _comms_names;
 
+            std::list< std::pair<std::string, std::string> > _reports_list;
+            
 
             //bool get_config_list_field(std::shared_ptr<beluga_utils::ini_reader> ini, std::string config_key, std::vector<std::string> & results_vec, std::string delim=",");
             virtual bool initialise_subdevices();

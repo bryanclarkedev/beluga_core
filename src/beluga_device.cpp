@@ -14,6 +14,7 @@ namespace beluga_core
     {        
         _config_file_path = config_file_path;
         _config_file_section = config_section;
+        _device_name = _config_file_section;
         _ini_ptr = std::make_shared<beluga_utils::ini_reader>(config_file_path);
 
         _ini_ptr->initialise();
@@ -33,6 +34,8 @@ namespace beluga_core
             _ini_ptr->initialise();
         }
         _config_file_section = config_section;
+        _device_name = _config_file_section;
+
         _config_file_path = ini->_config_file_path;
         return read_config();
     }

@@ -79,7 +79,7 @@ namespace beluga_core
             _stack_size_bytes = beluga_utils::string_to_int(stack_size_val);
         }
         /*
-        std::string task_object_name_key("task_object");
+        std::string task_object_name_key("primary_machine");
         std::string task_object_name_val;
         bool task_object_name_ok = _ini_ptr->get_config_value(_config_file_section, task_object_name_key, &task_object_name_val);
         if(task_object_name_ok)
@@ -98,30 +98,6 @@ namespace beluga_core
         beluga_utils::debug_print(_ss.str());
         _ss.str("");
 
-        #if 0
-        std::string machinery_name_key("machinery_name");
-        bool machinery_ok =  _ini_ptr->get_config_value(_config_file_section, machinery_name_key, &_machinery_name);
-        if(machinery_ok)
-        {
-            _ss.str("");
-            _ss << "Machinery name: " << _machinery_name;
-            beluga_utils::debug_print(_ss.str());
-            _ss.str("");
-
-            bool got_machinery = get_subdevice(_machinery_name, _machinery_ptr);
-            if(got_machinery)
-            {
-
-            }else{
-                error_loop_forever("thread error: could not find primary machinery despite one being named");
-            }
-        }else{
-            _ss.str("");
-            _ss << "No primary machinery in this thread,";
-            beluga_utils::debug_print(_ss.str());
-            _ss.str("");
-        }
-        #endif
             
         
         //These buffers are used to communicate with other threads. 
@@ -239,6 +215,7 @@ namespace beluga_core
     */
     bool thread::run(void * params)
     {
+        #if 0
         //Placeholder function - this should be replaced in inheriting classes
         std::string this_msg;
  
@@ -250,11 +227,12 @@ namespace beluga_core
             beluga_utils::debug_print(_ss.str());
             _ss.str("");
         }
-
+        #endif
 
         beluga_core::machine::run(params);
         _ss.str("");
 
+        #if 0
         //We will dump some placeholder messages to the _tx_buffer.
         unsigned long time_now_ms = millis();
         if(time_now_ms % 1000 == 0)
@@ -263,8 +241,10 @@ namespace beluga_core
             _tx_buffer->add_to_tx_queue(_ss.str());
             delay(1);
         }
-        //delay(1000); //Delay in ms
+        #endif
 
+        //delay(1000); //Delay in ms
+        delay(1);
         return true;
     }
 
