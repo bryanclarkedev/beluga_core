@@ -153,6 +153,7 @@ namespace beluga_core
                 _reports_list.clear();
                 for(auto iter = _subdevices.begin(); iter != _subdevices.end(); iter++){
                     std::string device_name = iter->first;
+                    iter->second->generate_report_string();
                     std::string report_str = iter->second->get_report_string();
                     _reports_list.push_back(std::make_pair(device_name, report_str));
                 }

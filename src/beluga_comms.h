@@ -68,11 +68,13 @@ namespace beluga_core
             bool get_tx_msg(std::string & s, std::string topic_str = beluga_utils::default_topic, bool pop_from_queue = true);
             virtual bool get_is_comms(){return _is_comms;}
 
+            std::vector<std::string> _tx_topic_list;
+            std::vector<std::string> _rx_topic_list;
+
         protected:
             std::map<std::string, std::list<std::string> > _tx_queue; //We have a map for key->per-topic-queue
             std::map<std::string, std::list<std::string> > _rx_queue;
-            std::vector<std::string> _tx_topic_list;
-            std::vector<std::string> _rx_topic_list;
+           
 
             std::map<std::string, unsigned long int>  _rx_time_ms;
             std::map<std::string, unsigned long int> _tx_time_ms;

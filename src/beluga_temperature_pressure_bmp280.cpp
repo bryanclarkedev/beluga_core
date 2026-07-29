@@ -1,4 +1,6 @@
 #include "beluga_temperature_pressure_bmp280.h"
+#include <iomanip> // Required for std::setprecision and std::fixed
+
 namespace beluga_core
 {
 
@@ -57,7 +59,36 @@ namespace beluga_core
         set_value(pressure_Pa, "pressure_Pa");
         set_value(altitude_m, "altitude_m");
 
+        _time_ms = millis();
         return true;        
+    }
+
+    void temperature_pressure_bmp280::generate_report_string(){
+        _ss.str("");
+        _ss << "{\"timestamp\": " << millis();
+        std::string b = _enabled ? "true" : "false"; 
+        _ss << ", \"enabled\": " <<  b;
+        
+        float pressure_Pa, temperature_C, altitude_m;
+        bool got_pressure_ok = get_value(pressure_Pa, "pressure_Pa" );
+        bool got_temp_ok = get_value(temperature_C, "temperature_C" );
+        bool got_altitude_ok = get_value(altitude_m, "altitude_m" );
+  
+        if(got_pressure_ok){
+            _ss << ", \"pressure_Pa: " << std::fixed << std::setprecision(2) << pressure_Pa ;
+        }
+
+        if(got_altitude_ok){
+            _ss << ", \"temperature_C: " << std::fixed << std::setprecision(2) << temperature_C ;
+        }
+
+        if(got_temp_ok){
+            _ss << ", \"altitude_m: " << std::fixed << std::setprecision(2) << altitude_m ;
+        }
+
+        _ss  << "}" ;
+        _report_string = _ss.str();
+        _ss.str("");
     }
 
 }

@@ -24,7 +24,7 @@ namespace beluga_core
             virtual bool run(void * p = nullptr );
             virtual bool read_config();
             //void printLastOperateStatus(DFRobot_BMP280_IIC::eStatus_t eStatus);
-
+            virtual void generate_report_string();
         protected:
             //Change parent class mechanism's set_value public->protected because this is a sensor and we don't want
             //external users trying to set its value

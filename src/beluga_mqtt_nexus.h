@@ -2,7 +2,7 @@
 #include "beluga_nexus.h"
 #include "beluga_mqtt_client.h"
 
-
+#include "beluga_constants.h"
 
 namespace beluga_core
 {
@@ -70,8 +70,20 @@ namespace beluga_core
                 } 
                 out_msg = _report_string;
                 */
-            std::string this_topic_str = "beluga/esp32/mqtt_nexus_rx";
-            _mqtt_client_ptr->get_rx_queue(out_msg_list, this_topic_str);  
+               for(auto topic_iter = _mqtt_client_ptr->_rx_topic_list.begin(); topic_iter !=  _mqtt_client_ptr->_rx_topic_list.end(); topic_iter++)
+               {
+                std::list<std::string> this_mail;
+                _mqtt_client_ptr->get_rx_queue(this_mail, *topic_iter);  
+                for(auto mail_iter =  this_mail.begin(); mail_iter != this_mail.end(); mail_iter++){
+                    _ss.str("");
+                    _ss << *topic_iter << beluga_utils::concatenation_delimiter << *mail_iter;
+                    out_msg_list.push_back(_ss.str());
+                    _ss.str("");
+                }
+
+               }
+            //std::string this_topic_str = "beluga/esp32/mqtt_nexus_rx";
+            //_mqtt_client_ptr->get_rx_queue(out_msg_list, this_topic_str);  
             return out_msg_list.size() > 0;
             
             }
