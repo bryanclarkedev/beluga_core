@@ -44,7 +44,7 @@ namespace beluga_core
                 if(comms_period_ok){
                     _comms_period_ms = beluga_utils::string_to_int(comms_period_ms_val_str);
                 }
-
+                _time_ms = millis();
                 return true;
             }
             //
@@ -70,8 +70,10 @@ namespace beluga_core
 
                     //We will dump some placeholder messages to the _tx_buffer.
                     unsigned long time_now_ms = millis();
-                    if(time_now_ms % _comms_period_ms == 0)
+                    unsigned long dt_ms = time_now_ms - _time_ms;
+                    if(dt_ms > _comms_period_ms )
                     {
+                        _time_ms = time_now_ms;
                         std::list<std::string> msg_list;
                         bool got_msg_out = msg_nexus_to_thread_buffer(msg_list);                        
                         if(got_msg_out)
