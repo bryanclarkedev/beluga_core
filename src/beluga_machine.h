@@ -164,7 +164,8 @@ namespace beluga_core
                 std::list< std::pair<std::string, std::string> > subdevice_reports = get_subdevice_reports();
                 
                 _ss.str("");
-                _ss << "{\"timestamp\": " << millis();
+                _ss << "{\"device_name\": " << _device_name;
+                _ss << ", \"timestamp\": " << millis();
                 std::string b = _enabled ? "true" : "false"; 
                 _ss << ", \"enabled\": " <<  b;
                 _ss << ", \"subdevices\": {";
