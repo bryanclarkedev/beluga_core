@@ -49,7 +49,6 @@ namespace beluga_core
             }
             //
             virtual bool run(void * p = nullptr){
-
                 //void pointer casting like this can be a bit dicey 
                 //but we know that the pointer is to the parent thread
                 beluga_core::thread * parent_thread =  static_cast<beluga_core::thread *>(p); 
@@ -71,8 +70,7 @@ namespace beluga_core
 
                     //We will dump some placeholder messages to the _tx_buffer.
                     unsigned long time_now_ms = millis();
-                    unsigned long dt_ms = time_now_ms - _time_ms;
-                    if(dt_ms >= _comms_period_ms )
+                    if(time_now_ms % _comms_period_ms == 0)
                     {
                         std::list<std::string> msg_list;
                         bool got_msg_out = msg_nexus_to_thread_buffer(msg_list);                        
@@ -88,7 +86,6 @@ namespace beluga_core
                             }
         
                         }
-                        _time_ms = millis();
                     }
                 }
                 return true;

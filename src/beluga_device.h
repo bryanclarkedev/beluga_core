@@ -55,7 +55,6 @@ namespace beluga_core
             virtual bool run(void * p = nullptr){
    
                 generate_report_string();
-                _time_ms = millis();
                 return _enabled;
             }
 
