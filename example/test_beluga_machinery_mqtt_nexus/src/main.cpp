@@ -7,7 +7,7 @@ export WIFI_SSID=MyWifiName
 export WIFI_PASSWORD=password123
 Open HiveMQ websocket client https://www.hivemq.com/demos/websocket-client/
 Subscribe to beluga/esp32/mqtt_nexus_tx
-Publish to beluga/esp32/mqtt_nexus_rx
+Publish to beluga/esp32/mqtt_nexus_rx: |status_led||0 OR |status_led||1
 
 */
 beluga_core::device this_device;

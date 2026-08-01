@@ -7,7 +7,7 @@
 #include "beluga_machine.h"
 #include "beluga_debug.h"
 #include "beluga_thread.h"
-
+#include "beluga_constants.h" //For concatenation_delimiter
 namespace beluga_core
 {
     /*!
@@ -93,14 +93,113 @@ namespace beluga_core
                 return true;
             }
 
-            //Reimplement this as needed
+
+
+            virtual bool split_and_process_msg(std::string in_msg){
+                std::vector<std::string> split_str = beluga_utils::split_string(in_msg, beluga_utils::concatenation_delimiter);
+                int n_fields_required = 3;
+                if(split_str.size() != n_fields_required){
+                    _ss.str("");
+                    _ss << "Beluga nexus split msg error: Needed " << n_fields_required << " fields, got " << split_str.size();
+                    beluga_utils::debug_print(_ss.str());
+                    _ss.str("");
+                    return false;
+                }
+                std::string subdevice_name = split_str[0]; //Is "" if the device is the nexus itself
+                std::string state_name = split_str[1];
+                std::string setpoint_value = split_str[2];
+                _ss.str("");
+                _ss << "Nexus got msg: Subdevice name: " << subdevice_name;
+                _ss << ", State name: " << state_name;
+                _ss << ", setpoint value: " << setpoint_value;
+                beluga_utils::debug_print(_ss.str());
+                _ss.str("");
+        
+                if(beluga_utils::string_is_number(setpoint_value)){
+                    int i = beluga_utils::string_to_int(setpoint_value);
+                    bool set_ok = this->set_setpoint(subdevice_name, i);
+                    _ss << "Set ok: " << set_ok << "!!!!!!!!!!!!!!!!!!!!!!!!!!";
+                    beluga_utils::debug_print(_ss.str());
+                    _ss.str("");
+                }else{
+                    _ss.str("");
+                    _ss << "Not a int: " << setpoint_value;
+                                        beluga_utils::debug_print(_ss.str());
+                    _ss.str("");
+                }
+                return true;
+            }
+
+            //Reimplement as needed for inheriting classes
+            virtual bool nexus_handle_msg(std::string in_msg){
+                _ss.str("");
+                _ss  << "Nexus handle msg: " << in_msg;
+                beluga_utils::debug_print(_ss.str());
+                _ss.str("");
+                return true;
+            }
+
+            /*
+            Reimplement this as needed
+            Typically the nexus will have its own message handling functions
+            But if we don't want to implement those, 
+            we can use the machine's set_setpoint. But this requires splitting up the input string
+            so that we know subdevice (if there is one), state we are setting the setpoint of,
+            and the setpoint value and value type.
+            We could use JSON but I am not a fan of the Arduino JSON libraries
+            (too much predefining message sizes).
+            Make a couple of assumptions:
+            - some messages will be handled by the nexus bespoke code, some may just use set_setpint.
+            -- to distinguish: 
+            ---if a message starts with a special character, we split it and process here
+            --- otherwise pass to the nexus to handle (implementation specific!)
+            - format is:
+            <delim><machine name><delim><state name><delim><setpoint value>
+            -- machine_name == "" if the device is the machine itself
+            -- state_name can also be "". So a valid message can look like <delim><delim><delim><setpoint value>
+            - in_msg will have a bunch of substrings separated by a delimter character
+            (I could use  JSON or XML but dont want to muck around with the parsing)
+            - if(string_is_number ) -> int
+            - else if(string_is_float) -> float
+            - else -> string
+            - For bool: handle it as a float.
+            */
             virtual bool msg_thread_buffer_to_nexus(std::string in_msg){
                 _ss.str("");
                 _ss << _device_name  << " Nexus got msg in: '" << in_msg << "'";
                 beluga_utils::debug_print(_ss.str());
                 _ss.str("");
+
+                if(in_msg.size() == 0){
+                    return false;
+                }
+                try
+                {
+                    _ss.str("");
+                    _ss << in_msg[0];
+                    std::string first_char_str = _ss.str();
+                    _ss.str("");
+                    bool parse_here = (first_char_str == beluga_utils::concatenation_delimiter) && (in_msg.size() > 1);
+                    if(parse_here){
+                        //Drop the first character
+                        in_msg.erase(0,1); 
+                       return split_and_process_msg(in_msg);
+                    }else{
+                        return nexus_handle_msg(in_msg);
+                    }
+                }
+                catch(const std::exception& e)
+                {
+                    _ss.str("");
+                    _ss << e.what() << '\n';
+                    beluga_utils::debug_print(_ss.str());
+                    _ss.str("");
+                }
+                
                 return true;
             }
+
+
             
             //Reimplement this as needed
             virtual bool msg_nexus_to_thread_buffer(std::list<std::string> & out_msg_list){

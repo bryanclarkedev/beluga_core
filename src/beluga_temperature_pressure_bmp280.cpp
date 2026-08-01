@@ -75,15 +75,15 @@ namespace beluga_core
         bool got_altitude_ok = get_value(altitude_m, "altitude_m" );
   
         if(got_pressure_ok){
-            _ss << ", \"pressure_Pa: " << std::fixed << std::setprecision(2) << pressure_Pa ;
+            _ss << ", \"pressure_Pa\": " << std::fixed << std::setprecision(2) << pressure_Pa ;
         }
 
         if(got_altitude_ok){
-            _ss << ", \"temperature_C: " << std::fixed << std::setprecision(2) << temperature_C ;
+            _ss << ", \"temperature_C\": " << std::fixed << std::setprecision(2) << temperature_C ;
         }
 
         if(got_temp_ok){
-            _ss << ", \"altitude_m: " << std::fixed << std::setprecision(2) << altitude_m ;
+            _ss << ", \"altitude_m\": " << std::fixed << std::setprecision(2) << altitude_m ;
         }
 
         _ss  << "}" ;

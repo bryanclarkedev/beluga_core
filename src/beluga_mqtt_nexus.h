@@ -50,7 +50,7 @@ namespace beluga_core
             }
             
             //Reimplement this as needed
-            virtual bool msg_thread_buffer_to_nexus(std::string in_msg){
+            virtual bool nexus_handle_msg(std::string in_msg){
                 _ss.str("");
                 _ss << _device_name  << " mqtt_nexus got msg in: '" << in_msg << "'";
                 beluga_utils::debug_print(_ss.str());
@@ -58,7 +58,7 @@ namespace beluga_core
                 //Publish
                 std::shared_ptr<beluga_core::device> this_device;
 
-                _mqtt_client_ptr->add_to_tx_queue(in_msg.c_str(), "beluga/esp32/mqtt_nexus_tx");                
+                _mqtt_client_ptr->add_to_tx_queue(in_msg.c_str(),  _mqtt_client_ptr->_tx_topic_list[0]);                 
                 return true;
             }
             
@@ -76,14 +76,14 @@ namespace beluga_core
                 _mqtt_client_ptr->get_rx_queue(this_mail, *topic_iter);  
                 for(auto mail_iter =  this_mail.begin(); mail_iter != this_mail.end(); mail_iter++){
                     _ss.str("");
-                    _ss << *topic_iter << beluga_utils::concatenation_delimiter << *mail_iter;
+                    //_ss << *topic_iter << beluga_utils::concatenation_delimiter << *mail_iter;
+                    _ss <<  *mail_iter;
+                    
                     out_msg_list.push_back(_ss.str());
                     _ss.str("");
                 }
 
                }
-            //std::string this_topic_str = "beluga/esp32/mqtt_nexus_rx";
-            //_mqtt_client_ptr->get_rx_queue(out_msg_list, this_topic_str);  
             return out_msg_list.size() > 0;
             
             }

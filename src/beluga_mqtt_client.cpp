@@ -90,6 +90,10 @@ namespace beluga_core
     {
         beluga_core::comms::read_config();
 
+        //TODO: CONFIG VAR FOR BUFFER SIZE
+        _mqtt_client.setBufferSize(1024);
+
+
         std::string mqtt_client_name_key("mqtt_client_name");
         //std::string mqtt_client_name_val;
         bool mqtt_client_name_ok = _ini_ptr->get_config_value(_config_file_section, mqtt_client_name_key, &_mqtt_client_name);
