@@ -201,4 +201,27 @@ namespace beluga_core
         return _ss.str();
     }
 
+    void rtc_sd2405::generate_report_string(){
+        std::string time_str, date_str;
+        bool time_ok = get_time_string(time_str);
+        bool date_ok = get_date_string(date_str);
+
+        _ss.str("");
+        
+        _ss << "{\"timestamp\": " << millis();
+        std::string b = _enabled ? "true" : "false"; 
+        _ss << ", \"enabled\": " <<  b;
+ 
+        if(time_ok){
+            _ss << ", \"time\": " << time_str;
+        }
+        if(date_ok){
+            _ss << ", \"date\": " << date_str;
+        }
+        
+        _ss  << "}" ;
+        _report_string = _ss.str();
+        _ss.str("");
+    }
+
 }

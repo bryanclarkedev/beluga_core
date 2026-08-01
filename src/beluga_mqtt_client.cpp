@@ -91,7 +91,7 @@ namespace beluga_core
         beluga_core::comms::read_config();
 
         //TODO: CONFIG VAR FOR BUFFER SIZE
-        _mqtt_client.setBufferSize(1024);
+        _mqtt_client.setBufferSize(2048);
 
 
         std::string mqtt_client_name_key("mqtt_client_name");

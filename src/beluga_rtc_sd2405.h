@@ -23,7 +23,8 @@ namespace beluga_core
             bool get_time_string(std::string &s);
             bool get_date_string(std::string & s);
             bool get_date_time_string(std::string & s);            
-        
+            void generate_report_string();
+            
         protected:
             std::string get_padded_time_digit(int i);
 

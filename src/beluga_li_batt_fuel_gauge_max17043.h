@@ -19,7 +19,8 @@ namespace beluga_core
             friend void swap(li_batt_fuel_gauge& first, li_batt_fuel_gauge& second); 
             virtual bool run(void * p = nullptr );
             virtual bool read_config();
-            
+            void generate_report_string();
+
         protected:
             //Change parent class mechanism's set_value public->protected because this is a sensor and we don't want
             //external users trying to set its value

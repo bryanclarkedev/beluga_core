@@ -68,4 +68,27 @@ namespace beluga_core
 
         return true;        
     }
+
+    void li_batt_fuel_gauge::generate_report_string(){
+        float voltage_V, percent;
+        bool volt_ok = get_value(voltage_V, "voltage_V");
+        bool percent_ok = get_value(percent, "percentage");
+        
+        _ss.str("");
+        
+        _ss << "{\"timestamp\": " << millis();
+        std::string b = _enabled ? "true" : "false"; 
+        _ss << ", \"enabled\": " <<  b;
+ 
+        if(volt_ok){
+            _ss << ", \"voltage_V\": " << voltage_V;
+        }
+        if(percent_ok){
+            _ss << ", \"percentage\": " << percent;
+        }
+        
+        _ss  << "}" ;
+        _report_string = _ss.str();
+        _ss.str("");
+    }
 }
