@@ -1,11 +1,13 @@
 #include "beluga_gpio.h"
 #include "beluga_debug.h"
-
+#include <Arduino.h>
+#include <cmath> //For std::pow
+#include <algorithm> //For std::min
 namespace beluga_core
 {
         
-
-
+    static uint8_t LED_CHANNEL_COUNT = 0;
+    const uint8_t MAX_LED_CHANNEL_COUNT = 15;
     //copy-and-swap for operator= per https://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
     gpio& gpio::operator=(gpio other) 
     {
@@ -53,6 +55,20 @@ namespace beluga_core
         if(config_ok)
         {
         set_pin_direction(config_val);
+        }
+            if(_device_type_str == "analog_output"){
+                uint32_t freq_hz = 100;
+                if(beluga_core::LED_CHANNEL_COUNT < beluga_core::MAX_LED_CHANNEL_COUNT){
+                    _channel = beluga_core::LED_CHANNEL_COUNT;
+                    //config_ok = ledcSetup(_channel, _freq_hz, n_bits_resolution, _channel );
+                    
+                    config_ok = ledcSetup(_channel, freq_hz, _n_bits_resolution); // Setup the channel
+                    ledcAttachPin(_pin_number, _channel);       // Attach pin to the channel
+                    if(! config_ok){
+                        beluga_utils::debug_print_loop_forever("Failure configuring analog output");
+                    }
+                    beluga_core::LED_CHANNEL_COUNT++;
+            }
         }
 
         return true;
@@ -155,6 +171,30 @@ namespace beluga_core
         return _configured;
     }
 
+    bool gpio::analog_write(int16_t val){
+        if (!_configured)
+        {
+            return false;
+        }
+        if(_pin_direction != OUTPUT)
+        {
+            return false;
+        }
+        //analogWriteFrequency( 5000);
+        //analogWrite(_pin_number, val);
+        //ledcAttach(_pin_number, 1000, 8); //_pin number, freq in hz, bits 1-14
+        //Max duty cycle == 2**n_bits_resolution - 1
+        uint16_t max_duty_cycle = (uint16_t) std::pow(2, _n_bits_resolution) - 1;
+        if(val > max_duty_cycle){
+            val = max_duty_cycle;
+        }
+        //uint16_t duty_cycle = std::min(val, max_duty_cycle);
+        ledcWrite(_channel, val);
+        
+        return true;
+
+    }
+
     bool gpio::analog_read(int16_t & return_val)
     {
         if (!_configured)
@@ -193,7 +233,7 @@ namespace beluga_core
         {
             return false;
         }
-
+        
         digitalWrite(_pin_number, val);
         return true;
     }

@@ -35,7 +35,7 @@ namespace beluga_core
             virtual bool digital_write(bool val);
             virtual bool digital_read(bool & return_val);
             virtual bool analog_read(int16_t & return_val);
-            
+            virtual bool analog_write(int16_t val);
             virtual bool set_pin_number(uint8_t s);
             virtual bool set_pin_number(std::string s);
             virtual uint8_t get_pin_number();
@@ -46,6 +46,9 @@ namespace beluga_core
         protected:
             uint8_t _pin_number = 0;
             uint8_t _pin_direction;
+            uint8_t _channel;
+            uint8_t _n_bits_resolution = 8; //1-20 bits
+            uint32_t _freq_hz = 100;
             bool _pin_number_set = false;
             bool _pin_direction_set = false;
             bool _configured = false;
