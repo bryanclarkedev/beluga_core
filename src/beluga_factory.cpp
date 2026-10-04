@@ -14,7 +14,7 @@
 #include "beluga_temperature_pressure_bmp280.h"
 #include "beluga_nexus.h"
 #include "beluga_mqtt_nexus.h"
-
+#include "beluga_solar_nexus.h"
 /*
 
 //All core object #includes go here.
@@ -94,7 +94,11 @@ namespace beluga_core
             case beluga_core_object_enum::mqtt_nexus:
             {
                 return std::make_shared<mqtt_nexus>();
-            }                           
+            }
+            case beluga_core_object_enum::solar_nexus:
+            {
+                return std::make_shared<solar_nexus>();
+            }                                         
             default:
             {
                 throw_line("Bad object type enum in beluga_factory!!!!");

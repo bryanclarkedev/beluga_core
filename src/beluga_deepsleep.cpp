@@ -173,6 +173,7 @@ namespace beluga_core
         
         if(_enable_wake_button == true)
         {
+            //My button is active low i.e. high when unpressed, low when pressed
             esp_sleep_enable_ext0_wakeup((gpio_num_t) _wake_button_pin_number,0); //1 = High (unpressed), 0 = Low (pressed)
         }        
         /*
@@ -192,7 +193,7 @@ namespace beluga_core
     {
         if(! _enabled)
         {
-            Serial.println("Seepsleep not enabled");
+            Serial.println("Deepsleep not enabled");
             return false;
         }
         if(_mode == deepsleep_wake_duration_mode::n_iterations)
@@ -248,5 +249,42 @@ namespace beluga_core
         }
         return false;
     }
+
+    void deepsleep::generate_report_string(){
+
+        _ss.str("");
+        _ss << "{\"timestamp\": " << millis();
+        std::string b = _enabled ? "true" : "false"; 
+        _ss << ", \"enabled\": " <<  b;
+
+
+        std::string mode_str;
+        int time_remaining_s = -1;
+        int n_iterations_remaining = -1;
+        int n_seconds_remaining = -1;
+        if(_mode == deepsleep_wake_duration_mode::n_iterations)
+        {
+            mode_str = "n_iterations";
+            _ss << ", \"mode\": \"" << mode_str << "\", \"n_remaining\": ";
+
+
+            n_iterations_remaining = _wake_duration_threshold - _wake_iterations;
+            _ss << n_iterations_remaining;
+        }
+        if(_mode == deepsleep_wake_duration_mode::duration_s )
+        {
+            mode_str = "duration_s";
+            _ss << ", \"mode\": \"" << mode_str << "\", \"n_remaining\": ";
+
+            unsigned long time_awake_s = _wake_dt_ms / 1000;
+            n_seconds_remaining = _wake_duration_threshold - time_awake_s; 
+            _ss << n_seconds_remaining;
+        }
+
+        _ss  << "}" ;
+        _report_string = _ss.str();
+        _ss.str("");
+    }
+
 
 }

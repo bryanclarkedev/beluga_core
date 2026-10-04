@@ -31,7 +31,7 @@ ENUMITEM(interthread_buffer)
 ENUMITEM(temperature_pressure_bmp280)
 ENUMITEM(li_batt_fuel_gauge)
 ENUMITEM(rtc_sd2405)
-
+ENUMITEM(solar_nexus)
 /*
 ENUMITEM(Button)
 ENUMITEM(LSM303_Compass_Accelerometer)

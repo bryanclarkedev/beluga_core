@@ -1,3 +1,10 @@
+/*
+export WIFI_SSID=MyWifiName
+export WIFI_PASSWORD=password123
+Open HiveMQ websocket client https://www.hivemq.com/demos/websocket-client/
+Subscribe to beluga/esp32/mqtt_nexus_tx
+Publish to beluga/esp32/mqtt_nexus_rx
+*/
 #include <Arduino.h>
 #include "beluga_device.h"
 #include "beluga_machine.h"
@@ -6,8 +13,11 @@
 #include "beluga_temperature_pressure_bmp280.h"
 #include "beluga_li_batt_fuel_gauge_max17043.h"
 #include <iomanip> // Required for std::setprecision 
+#include "beluga_solar_nexus.h"
+#include "beluga_machinery.h"
 
-beluga_core::machine this_machine;
+//beluga_core::machine this_machine;
+beluga_core::machinery solar_machinery;
 
 std::string config_file_path = "/test.ini";
 
@@ -22,17 +32,21 @@ void setup() {
     Serial.println(5-i);
     delay(1000);
   }    
-  try{
-  this_machine.initialise(config_file_path, "solar_sensor");
-  }
-  catch(...){
-    Serial.println("Problem!");
-  }
+
+   //Need to initialise wire early or I2C devices won't run
+  Wire.begin();//Can set pin mapping here if we want.
+
+  solar_machinery.initialise(config_file_path, "solar_nexus_demo");
 }
 
 void loop() {
+
+  solar_machinery.run();
+  solar_machinery.kill_main_thread();
+
+  #if 0
   unsigned long time_now_s = (int)( millis() / 1000);
-  bool b = this_machine.run();
+  bool b = this_solar_nexus.run();
 
   /*
   We assume that the subdevice name and type are known to the programmer. 
@@ -71,8 +85,9 @@ void loop() {
   ss << "Button state: " << button_state;
   Serial.println(ss.str().c_str());
 
+#endif
 
-#if 1
+#if 0
   std::string fuel_gauge_name = "fuel_gauge";
   float voltage_V, percentage;
   try{
@@ -116,11 +131,13 @@ void loop() {
 
   #endif
 
+  #if 0
   ss.str("");
   ss << "Iteration " << iter << " time " << time_now_s << "s";
   Serial.println(ss.str().c_str());
 
 
   iter++;
+  #endif
   delay(1000);
 }

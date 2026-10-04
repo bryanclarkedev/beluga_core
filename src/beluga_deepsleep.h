@@ -51,7 +51,7 @@ namespace beluga_core
 
             void commence_deepsleep();
             //void print_wakeup_reason();
-
+            void generate_report_string();
         protected:
             void configure_deepsleep();
             bool read_config_sleep_duration();
