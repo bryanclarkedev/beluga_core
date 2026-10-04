@@ -72,7 +72,7 @@ void loop() {
   Serial.println(ss.str().c_str());
 
 
-#if 0
+#if 1
   std::string fuel_gauge_name = "fuel_gauge";
   float voltage_V, percentage;
   try{
